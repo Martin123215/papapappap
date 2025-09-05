@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="mafia">
+<head>
+  <meta charset="UTF-8" />
+  <title>THE SUPPLIER</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <img src="imagenes/logo.png" alt="THE SUPPLIER Logo" />
+      <h1>THE SUPPLIER</h1>
+    </div>
+    <nav>
+      <button data-target="stockView" class="selected" aria-controls="stockView">Stock</button>
+      <button data-target="inventorySummary" aria-controls="inventorySummary">Resumen</button>
+      <button data-target="propertyList" aria-controls="propertyList">Propiedades</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="stockView" class="visible">
+      <h2>Registrar Producto</h2>
+      <form id="formAddProduct">
+        <label for="depositoInput">Depósito</label>
+        <input type="text" id="depositoInput" required />
+
+        <label for="articuloInput">Artículo</label>
+        <input type="text" id="articuloInput" required />
+
+        <label for="cantidadInput">Cantidad</label>
+        <input type="number" id="cantidadInput" min="1" required />
+
+        <button type="submit" class="save-btn">Guardar</button>
+      </form>
+
+      <label for="filterInput" class="filter-label">Buscar artículo:</label>
+      <input type="text" id="filterInput" placeholder="Escribe para filtrar..." />
+
+      <div id="stockContainer" class="results-box"></div>
+    </section>
+
+    <section id="inventorySummary">
+      <h2>Resumen de Inventario</h2>
+      <div id="summaryContainer"></div>
+    </section>
+
+    <section id="propertyList">
+      <h2>Propiedades</h2>
+      <div id="propertiesContainer"></div>
+
+      <form id="formAddProperty" class="add-property-form">
+        <h3>Agregar Propiedad Nueva</h3>
+        <label for="propNameInput">Nombre</label>
+        <input type="text" id="propNameInput" required />
+
+        <label for="propLiberacionInput">Precio Liberación</label>
+        <input type="number" id="propLiberacionInput" min="0" step="0.01" required />
+
+        <label for="propGobiernoInput">Precio Gobierno</label>
+        <input type="number" id="propGobiernoInput" min="0" step="0.01" required />
+
+        <button type="submit" class="save-btn">Agregar</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
