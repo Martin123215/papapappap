@@ -8,12 +8,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyASbs-HGfD0VQwWRudkMCpUAk_NewJqnUw",
-  authDomain: "inventario-701cb.firebaseapp.com",
-  projectId: "inventario-701cb",
-  storageBucket: "inventario-701cb.firebasestorage.app",
-  messagingSenderId: "579997039165",
-  appId: "1:579997039165:web:e32117e3fab909a9c60854"
+  apiKey: "AIzaSyCUP5e1f8J-fRUVO3WVax9KPtFLSJaVd2w",
+  authDomain: "inventario-6c56b.firebaseapp.com",
+  projectId: "inventario-6c56b",
+  storageBucket: "inventario-6c56b.firebasestorage.app",
+  messagingSenderId: "250471340120",
+  appId: "1:250471340120:web:113ea0038cc49497c9122d",
+  measurementId: "G-PXG45EEKR4"
 };
 
 const app = initializeApp(firebaseConfig);
