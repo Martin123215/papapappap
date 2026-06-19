@@ -13,6 +13,7 @@
     <nav>
       <button data-target="stockView" class="selected" aria-controls="stockView">Stock</button>
       <button data-target="inventorySummary" aria-controls="inventorySummary">Resumen</button>
+      <button data-target="propertyList" aria-controls="propertyList">Propiedades</button>
     </nav>
   </header>
 
@@ -43,7 +44,24 @@
       <div id="summaryContainer"></div>
     </section>
 
-    
+    <section id="propertyList">
+      <h2>Propiedades</h2>
+      <div id="propertiesContainer"></div>
+
+      <form id="formAddProperty" class="add-property-form">
+        <h3>Agregar Propiedad Nueva</h3>
+        <label for="propNameInput">Nombre</label>
+        <input type="text" id="propNameInput" required />
+
+        <label for="propLiberacionInput">Precio Liberación</label>
+        <input type="number" id="propLiberacionInput" min="0" step="0.01" required />
+
+        <label for="propGobiernoInput">Precio Gobierno</label>
+        <input type="number" id="propGobiernoInput" min="0" step="0.01" required />
+
+        <button type="submit" class="save-btn">Agregar</button>
+      </form>
+    </section>
   </main>
 
   <script src="script.js"></script>
