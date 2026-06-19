@@ -57,22 +57,19 @@ form.addEventListener("submit", async (e) => {
   try {
 
     await addDoc(collection(db, "inventario"), {
-      deposito,
-      articulo,
-      cantidad,
-      fecha: Date.now()
-    });
+  deposito,
+  articulo,
+  cantidad
+});
 
     form.reset();
 
     cargarProductos();
 
   } catch (error) {
-
-    console.error(error);
-    alert("Error al guardar");
-
-  }
+  console.error(error);
+  alert(error.message);
+}
 });
 
 async function cargarProductos() {
