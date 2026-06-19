@@ -4,7 +4,7 @@ let stockActual = {};
 let tarifas = {};
 let listaPropiedades = {};
 
-const CLAVE_ACCESO = "2015";
+const CLAVE_ACCESO = "26111931";
 
 function solicitarClave() {
   const claveIngresada = prompt("Introduce la clave para acceder:");
