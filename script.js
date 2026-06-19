@@ -266,4 +266,83 @@ try {
 } catch (_) {
   // Clave incorrecta: no continuar
 }
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyASbs-HGfD0VQwWRudkMCpUAk_NewJqnUw",
+  authDomain: "inventario-701cb.firebaseapp.com",
+  projectId: "inventario-701cb",
+  storageBucket: "inventario-701cb.firebasestorage.app",
+  messagingSenderId: "579997039165",
+  appId: "1:579997039165:web:e32117e3fab909a9c60854",
+  measurementId: "G-WNBENR7SGY"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const form = document.getElementById("formAddProduct");
+const stockContainer = document.getElementById("stockContainer");
+
+async function cargarProductos() {
+  stockContainer.innerHTML = "";
+
+  const q = query(
+    collection(db, "inventario"),
+    orderBy("fecha", "desc")
+  );
+
+  const snapshot = await getDocs(q);
+
+  snapshot.forEach((doc) => {
+    const item = doc.data();
+
+    stockContainer.innerHTML += `
+      <div class="producto">
+        <strong>${item.articulo}</strong><br>
+        Depósito: ${item.deposito}<br>
+        Cantidad: ${item.cantidad}
+      </div>
+    `;
+  });
+}
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const deposito = document.getElementById("depositoInput").value;
+  const articulo = document.getElementById("articuloInput").value;
+  const cantidad = parseInt(
+    document.getElementById("cantidadInput").value
+  );
+
+  try {
+    await addDoc(collection(db, "inventario"), {
+      deposito,
+      articulo,
+      cantidad,
+      fecha: new Date()
+    });
+
+    form.reset();
+
+    await cargarProductos();
+
+    alert("Producto guardado");
+  } catch (error) {
+    console.error(error);
+    alert("Error al guardar");
+  }
+});
+
+cargarProductos();
 })();
