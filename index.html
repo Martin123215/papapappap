@@ -1,49 +1,65 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="mafia">
+<html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Inventario</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventario</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <div class="logo-container">
-      <h1>Inventario</h1>
-    </div>
-    <nav>
-      <button data-target="stockView" class="selected" aria-controls="stockView">Stock</button>
-      <button data-target="inventorySummary" aria-controls="inventorySummary">Resumen</button>
-    </nav>
-  </header>
 
-  <main>
-    <section id="stockView" class="visible">
-      <h2>Registrar Producto</h2>
-      <form id="formAddProduct">
-        <label for="depositoInput">Depósito</label>
-        <input type="text" id="depositoInput" required />
+<header>
+  <h1>Inventario</h1>
 
-        <label for="articuloInput">Artículo</label>
-        <input type="text" id="articuloInput" required />
+  <nav>
+    <button data-target="stockView" class="selected">Stock</button>
+    <button data-target="inventorySummary">Resumen</button>
+  </nav>
+</header>
 
-        <label for="cantidadInput">Cantidad</label>
-        <input type="number" id="cantidadInput" min="1" required />
+<main>
 
-        <button type="submit" class="save-btn">Guardar</button>
-      </form>
+<section id="stockView" class="visible">
 
-      <label for="filterInput" class="filter-label">Buscar artículo:</label>
-      <input type="text" id="filterInput" placeholder="Escribe para filtrar..." />
+  <h2>Registrar Producto</h2>
 
-      <div id="stockContainer" class="results-box"></div>
-    </section>
+  <form id="formAddProduct">
 
-    <section id="inventorySummary">
-      <h2>Resumen de Inventario</h2>
-      <div id="summaryContainer"></div>
-    </section>
-  </main>
+    <label>Depósito</label>
+    <input type="text" id="depositoInput" required>
 
-  <script src="script.js"></script>
+    <label>Artículo</label>
+    <input type="text" id="articuloInput" required>
+
+    <label>Cantidad</label>
+    <input type="number" id="cantidadInput" min="1" required>
+
+    <button type="submit">Guardar</button>
+
+  </form>
+
+  <br>
+
+  <label>Buscar artículo</label>
+  <input type="text" id="filterInput">
+
+  <div id="stockContainer"></div>
+
+</section>
+
+<section id="inventorySummary">
+
+  <h2>Resumen</h2>
+
+  <div id="summaryContainer"></div>
+
+</section>
+
+</main>
+
+<script type="module" src="script.js"></script>
+
 </body>
-</html> 
+</html>
+
+
