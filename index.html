@@ -1,66 +1,535 @@
-html
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="mafia">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inventario</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>THE SUPPLIER</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Roboto+Condensed&display=swap');
+
+    :root {
+      --bg-dark: #0f0f0f;
+      --bg-panel: #1c1c1c;
+      --text-light: #f5f5f5;
+      --text-muted: #aaa;
+      --gold: #d4af37;
+      --danger: #aa3e3e;
+      --accent: #444;
+      --shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+      --radius: 12px;
+    }
+
+    [data-theme="mafia"] {
+      font-family: 'Roboto Condensed', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: var(--bg-panel);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow);
+      border-bottom: 2px solid var(--gold);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-container img {
+      height: 60px;
+      border-radius: var(--radius);
+    }
+
+    .logo-container h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--gold);
+      margin: 0;
+    }
+
+    nav {
+      display: flex;
+      gap: 1rem;
+    }
+
+    nav button {
+      background: none;
+      border: 2px solid transparent;
+      color: var(--text-light);
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: var(--radius);
+    }
+
+    nav button.selected,
+    nav button:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    main {
+      padding: 2rem;
+    }
+
+    section {
+      display: none;
+      background: var(--bg-panel);
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    section.visible {
+      display: block;
+    }
+
+    h2, h3 {
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 0.5rem;
+      background: #111;
+      color: var(--text-light);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      margin-top: 0.5rem;
+    }
+
+    .save-btn {
+      background-color: var(--gold);
+      color: #000;
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: var(--radius);
+      margin-top: 1.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .save-btn:hover {
+      background-color: #c9a432;
+    }
+
+    .filter-label {
+      margin-top: 2rem;
+    }
+
+    #filterInput {
+      margin-top: 0.5rem;
+    }
+
+    .results-box,
+    #summaryContainer,
+    #propertiesContainer {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #111;
+      border-radius: var(--radius);
+      border: 1px solid var(--accent);
+    }
+
+    form {
+      margin-top: 1rem;
+    }
+
+    .add-property-form {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--gold);
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav {
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--accent);
+    }
+
+    tfoot td {
+      text-align: right;
+    }
+
+    td:last-child {
+      text-align: right;
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <div class="logo-container">
+      <img src="c:\Users\Pc\Pictures\ChatGPT_Image_20_abr_2025_08_36_15_a.m..png" alt="THE SUPPLIER Logo" />
+      
+    </div>
+    <nav>
+      <button data-target="stockView" class="selected" aria-controls="stockView">Stock</button>
+      <button data-target="inventorySummary" aria-controls="inventorySummary">Resumen</button>
+      <button data-target="propertyList" aria-controls="propertyList">Propiedades</button>
+    </nav>
+  </header>
 
-<header>
-  <h1>Inventario</h1>
+  <main>
+    <section id="stockView" class="visible">
+      <h2>Registrar Producto</h2>
+      <form id="formAddProduct">
+        <label for="depositoInput">Depósito</label>
+        <input type="text" id="depositoInput" required />
 
-  <nav>
-    <button data-target="stockView" class="selected">Stock</button>
-    <button data-target="inventorySummary">Resumen</button>
-  </nav>
-</header>
+        <label for="articuloInput">Artículo</label>
+        <input type="text" id="articuloInput" required />
 
-<main>
+        <label for="cantidadInput">Cantidad</label>
+        <input type="number" id="cantidadInput" min="1" required />
 
-<section id="stockView" class="visible">
+        <button type="submit" class="save-btn">Guardar</button>
+      </form>
 
-  <h2>Registrar Producto</h2>
+      <label for="filterInput" class="filter-label">Buscar artículo:</label>
+      <input type="text" id="filterInput" placeholder="Escribe para filtrar..." />
 
-  <form id="formAddProduct">
+      <div id="stockContainer" class="results-box"></div>
+    </section>
 
-    <label>Depósito</label>
-    <input type="text" id="depositoInput" required>
+    <section id="inventorySummary">
+      <h2>Resumen de Inventario</h2>
+      <div id="summaryContainer"></div>
+    </section>
 
-    <label>Artículo</label>
-    <input type="text" id="articuloInput" required>
+    <section id="propertyList">
+      <h2>Propiedades</h2>
+      <div id="propertiesContainer"></div>
 
-    <label>Cantidad</label>
-    <input type="number" id="cantidadInput" min="1" required>
+      <form id="formAddProperty" class="add-property-form">
+        <h3>Agregar Propiedad Nueva</h3>
+        <label for="propNameInput">Nombre</label>
+        <input type="text" id="propNameInput" required />
 
-    <button type="submit">Guardar</button>
+        <label for="propLiberacionInput">Precio Liberación</label>
+        <input type="number" id="propLiberacionInput" min="0" step="0.01" required />
 
-  </form>
+        <label for="propGobiernoInput">Precio Gobierno</label>
+        <input type="number" id="propGobiernoInput" min="0" step="0.01" required />
 
-  <br>
+        <button type="submit" class="save-btn">Agregar</button>
+      </form>
+    </section>
+  </main>
 
-  <label>Buscar artículo</label>
-  <input type="text" id="filterInput">
+  <script>
+    (() => {
+  // Variables principales
+  let stockActual = {};
+  let tarifas = {};
+  let listaPropiedades = {};
 
-  <div id="stockContainer"></div>
+  const CLAVE_ACCESO = "2015";
 
-</section>
+  function solicitarClave() {
+    const claveIngresada = prompt("Introduce la clave para acceder:");
+    if (claveIngresada !== CLAVE_ACCESO) {
+      document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:50px;">ACCESO NO AUTORIZADO</h1>';
+      throw new Error("Clave incorrecta");
+    }
+  }
 
-<section id="inventorySummary">
+  function guardarLocal() {
+    localStorage.setItem('inventarioOficina', JSON.stringify(stockActual));
+    localStorage.setItem('preciosOficina', JSON.stringify(tarifas));
+    localStorage.setItem('propiedadesOficina', JSON.stringify(listaPropiedades));
+  }
 
-  <h2>Resumen</h2>
+  function inicializarDatos() {
+    stockActual = JSON.parse(localStorage.getItem('inventarioOficina')) || {};
+    tarifas = JSON.parse(localStorage.getItem('preciosOficina')) || {};
+    listaPropiedades = JSON.parse(localStorage.getItem('propiedadesOficina')) || {
+      "Terreno Norte": { liberacion: 1000, gobierno: 1500 },
+      "Estación Central": { liberacion: 5000, gobierno: 8000 }
+    };
+  }
 
-  <div id="summaryContainer"></div>
+  function cambiarSeccion(seccionId) {
+    document.querySelectorAll('main section').forEach(sec => sec.classList.remove('visible'));
+    document.getElementById(seccionId).classList.add('visible');
 
-</section>
+    document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('selected'));
+    document.querySelector(`nav button[data-target="${seccionId}"]`).classList.add('selected');
 
-</main>
+    if (seccionId === 'stockView') actualizarInventario();
+    else if (seccionId === 'inventorySummary') generarResumen();
+    else if (seccionId === 'propertyList') cargarPropiedades();
+  }
 
-<script type="module" src="script.js"></script>
+  function actualizarInventario() {
+    const termino = document.getElementById('filterInput').value.trim().toLowerCase();
+    let html = '';
 
+    for (const almacen in stockActual) {
+      let filas = '';
+      for (const item in stockActual[almacen]) {
+        if (item.toLowerCase().includes(termino)) {
+          filas += `
+            <tr>
+              <td>${item}</td>
+              <td>${stockActual[almacen][item]}</td>
+              <td>
+                <button class="small-action secondary" onclick="retirarUnidades('${almacen}', '${item}')">Quitar</button>
+                <button class="small-action" onclick="eliminarItem('${almacen}', '${item}')">Eliminar</button>
+              </td>
+            </tr>
+          `;
+        }
+      }
+      if (filas) {
+        html += `
+          <h3>Depósito: ${almacen}</h3>
+          <table>
+            <thead><tr><th>Artículo</th><th>Cantidad</th><th>Acciones</th></tr></thead>
+            <tbody>${filas}</tbody>
+          </table>
+        `;
+      }
+    }
+
+    document.getElementById('stockContainer').innerHTML = html || '<p>No hay artículos que coincidan con el filtro.</p>';
+  }
+
+  function insertarProducto(e) {
+    e.preventDefault();
+    const deposito = document.getElementById('depositoInput').value.trim();
+    const nombreArticulo = document.getElementById('articuloInput').value.trim();
+    const cantidad = parseInt(document.getElementById('cantidadInput').value, 10);
+
+    if (!deposito || !nombreArticulo || isNaN(cantidad) || cantidad < 1) {
+      alert('Por favor ingresa datos válidos.');
+      return;
+    }
+
+    if (!stockActual[deposito]) stockActual[deposito] = {};
+    stockActual[deposito][nombreArticulo] = (stockActual[deposito][nombreArticulo] || 0) + cantidad;
+
+    guardarLocal();
+    actualizarInventario();
+    e.target.reset();
+  }
+
+  window.retirarUnidades = function(deposito, producto) {
+    let cantidad = prompt(`¿Cuántas unidades deseas quitar de "${producto}" en "${deposito}"?`);
+    cantidad = parseInt(cantidad, 10);
+    if (isNaN(cantidad) || cantidad < 1) return;
+
+    stockActual[deposito][producto] -= cantidad;
+    if (stockActual[deposito][producto] <= 0) delete stockActual[deposito][producto];
+    if (Object.keys(stockActual[deposito]).length === 0) delete stockActual[deposito];
+
+    guardarLocal();
+    actualizarInventario();
+  };
+
+  window.eliminarItem = function(deposito, producto) {
+    if (confirm(`¿Seguro deseas eliminar "${producto}" del depósito "${deposito}"?`)) {
+      delete stockActual[deposito][producto];
+      if (Object.keys(stockActual[deposito]).length === 0) delete stockActual[deposito];
+
+      guardarLocal();
+      actualizarInventario();
+    }
+  };
+
+  function generarResumen() {
+    const acumulado = {};
+    for (const deposito in stockActual) {
+      for (const item in stockActual[deposito]) {
+        acumulado[item] = (acumulado[item] || 0) + stockActual[deposito][item];
+      }
+    }
+
+    let total = 0;
+    let tabla = `
+      <table>
+        <thead>
+          <tr>
+            <th>Artículo</th>
+            <th>Cantidad Total</th>
+            <th>Precio Unitario</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    for (const item in acumulado) {
+      const precio = tarifas[item] ?? 0;
+      const subtotal = acumulado[item] * precio;
+      total += subtotal;
+
+      tabla += `
+        <tr>
+          <td>${item}</td>
+          <td>${acumulado[item]}</td>
+          <td><input type="number" min="0" step="0.01" value="${precio}" onchange="modificarPrecio('${item}', this.value)" /></td>
+          <td>$${subtotal.toFixed(2)}</td>
+        </tr>
+      `;
+    }
+
+    tabla += `
+        </tbody>
+        <tfoot>
+          <tr style="font-weight:bold;">
+            <td colspan="3">Total General</td>
+            <td>$${total.toFixed(2)}</td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+
+    document.getElementById('summaryContainer').innerHTML = tabla;
+  }
+
+  window.modificarPrecio = function(item, nuevoValor) {
+    const nuevo = parseFloat(nuevoValor);
+    if (!isNaN(nuevo) && nuevo >= 0) {
+      tarifas[item] = nuevo;
+      guardarLocal();
+      generarResumen();
+    }
+  };
+
+  function cargarPropiedades() {
+    let totalLib = 0;
+    let totalGob = 0;
+    let tabla = `
+      <table>
+        <thead>
+          <tr>
+            <th>Propiedad</th>
+            <th>Precio Liberación</th>
+            <th>Precio Gobierno</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    for (const nombre in listaPropiedades) {
+      const { liberacion, gobierno } = listaPropiedades[nombre];
+      totalLib += liberacion;
+      totalGob += gobierno;
+
+      tabla += `
+        <tr>
+          <td>${nombre}</td>
+          <td>$${liberacion.toFixed(2)}</td>
+          <td>$${gobierno.toFixed(2)}</td>
+          <td><button class="small-action" onclick="quitarPropiedad('${nombre}')">Eliminar</button></td>
+        </tr>
+      `;
+    }
+
+    tabla += `
+        </tbody>
+        <tfoot>
+          <tr style="font-weight:bold;">
+            <td>Total</td>
+            <td>$${totalLib.toFixed(2)}</td>
+            <td>$${totalGob.toFixed(2)}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+
+    document.getElementById('propertiesContainer').innerHTML = tabla;
+  }
+
+  function nuevaPropiedad(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('propNameInput').value.trim();
+    const lib = parseFloat(document.getElementById('propLiberacionInput').value);
+    const gob = parseFloat(document.getElementById('propGobiernoInput').value);
+
+    if (!nombre || isNaN(lib) || isNaN(gob) || lib < 0 || gob < 0) {
+      alert('Por favor introduce datos válidos para la propiedad.');
+      return;
+    }
+
+    listaPropiedades[nombre] = { liberacion: lib, gobierno: gob };
+    guardarLocal();
+    cargarPropiedades();
+    e.target.reset();
+  }
+
+  window.quitarPropiedad = function(nombre) {
+    if (confirm(`¿Seguro quieres eliminar la propiedad "${nombre}"?`)) {
+      delete listaPropiedades[nombre];
+      guardarLocal();
+      cargarPropiedades();
+    }
+  };
+
+  // Eventos
+  document.querySelectorAll('nav button').forEach(btn =>
+    btn.addEventListener('click', () => cambiarSeccion(btn.dataset.target))
+  );
+
+  document.getElementById('formAddProduct').addEventListener('submit', insertarProducto);
+  document.getElementById('filterInput').addEventListener('input', actualizarInventario);
+  document.getElementById('formAddProperty').addEventListener('submit', nuevaPropiedad);
+
+  // Inicialización
+  try {
+    solicitarClave();
+    inicializarDatos();
+    cambiarSeccion('stockView');
+  } catch (_) {
+    // Clave incorrecta: no continuar
+  }
+})();
+  </script>
 </body>
 </html>
-
-
