@@ -7,16 +7,6 @@ import {
   onValue
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
-//const CLAVE = "2015";
-
-//const clave = prompt("Ingrese la clave de acceso");
-
-//if (clave !== CLAVE) {
-//  document.body.innerHTML =
-//    "<h1 style='text-align:center;color:red'>ACCESO DENEGADO</h1>";
-//  throw new Error("Acceso denegado");
-//}
-
 const form = document.getElementById("formAddProduct");
 const filtro = document.getElementById("filterInput");
 const stockContainer = document.getElementById("stockContainer");
@@ -25,72 +15,57 @@ const productosRef = ref(db, "productos");
 
 let productos = {};
 
+// GUARDAR
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const deposito =
-    document.getElementById("depositoInput").value.trim();
-
-  const articulo =
-    document.getElementById("articuloInput").value.trim();
-
-  const cantidad =
-    parseInt(
-      document.getElementById("cantidadInput").value,
-      10
-    );
+  const deposito = document.getElementById("depositoInput").value.trim();
+  const articulo = document.getElementById("articuloInput").value.trim();
+  const cantidad = parseInt(document.getElementById("cantidadInput").value, 10);
 
   if (!deposito || !articulo || isNaN(cantidad)) {
     alert("Completa todos los campos");
     return;
   }
 
-try {
+  try {
+    await push(productosRef, {
+      deposito,
+      articulo,
+      cantidad
+    });
 
-  console.log("Intentando guardar...");
+    console.log("Guardado correctamente");
+    form.reset();
 
-try {
-
-  await push(productosRef, {
-    deposito,
-    articulo,
-    cantidad
-  });
-
-  console.log("Guardado correctamente");
-
-} catch (error) {
-
-  console.error("Error Firebase:", error);
-
-}
-  console.log("Guardado correctamente");
-
-  form.reset();
-
-} catch (error) {
-
-  console.error("ERROR FIREBASE:", error);
-
-}
-
-  form.reset();
+  } catch (error) {
+    console.error("ERROR FIREBASE:", error);
+  }
 });
 
+// CARGAR DATOS EN TIEMPO REAL (ESTO TE FALTABA)
+onValue(productosRef, (snapshot) => {
+
+  productos = snapshot.val() || {};
+
+  renderizar();
+
+});
+
+// FILTRO
+filtro.addEventListener("input", renderizar);
+
+// RENDER POR DEPÓSITOS
 function renderizar() {
 
   const texto = filtro.value.toLowerCase();
-
   const depositos = {};
 
   Object.keys(productos).forEach(id => {
 
     const item = productos[id];
 
-    if (
-      texto &&
-      !item.articulo.toLowerCase().includes(texto)
-    ) {
+    if (texto && !item.articulo.toLowerCase().includes(texto)) {
       return;
     }
 
@@ -98,11 +73,7 @@ function renderizar() {
       depositos[item.deposito] = [];
     }
 
-    depositos[item.deposito].push({
-      id,
-      ...item
-    });
-
+    depositos[item.deposito].push({ id, ...item });
   });
 
   let html = "";
@@ -137,27 +108,17 @@ function renderizar() {
       `;
     });
 
-    html += `
-      </table>
-    `;
+    html += `</table>`;
   });
 
-  if (html === "") {
-    html = "<p>No hay productos.</p>";
-  }
-
-  stockContainer.innerHTML = html;
+  stockContainer.innerHTML =
+    html || "<p>No hay productos</p>";
 }
-filtro.addEventListener("input", renderizar);
 
+// ELIMINAR
 window.eliminarProducto = async function(id) {
 
-  if (!confirm("¿Eliminar producto?")) {
-    return;
-  }
+  if (!confirm("¿Eliminar producto?")) return;
 
-  await remove(
-    ref(db, "productos/" + id)
-  );
-
+  await remove(ref(db, "productos/" + id));
 };
