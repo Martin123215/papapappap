@@ -209,7 +209,7 @@ function insertarProducto(e) {
 
     e.target.reset();
 }
-window.retirarUnidades = function (deposito, producto) {
+    window.retirarUnidades = function (deposito, producto) {
 
     let cantidad = prompt(
         `¿Cuántas unidades deseas quitar de "${producto}" en "${deposito}"?`
