@@ -7,9 +7,9 @@ import {
   onValue
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
-const CLAVE = "2015";
+//const CLAVE = "2015";
 
-const clave = prompt("Ingrese la clave de acceso");
+//const clave = prompt("Ingrese la clave de acceso");
 
 //if (clave !== CLAVE) {
 //  document.body.innerHTML =
