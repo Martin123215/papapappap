@@ -1,155 +1,211 @@
-javascript
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+(() => {
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCUP5e1f8J-fRUVO3WVax9KPtFLSJaVd2w",
-  authDomain: "inventario-6c56b.firebaseapp.com",
-  projectId: "inventario-6c56b",
-  storageBucket: "inventario-6c56b.firebasestorage.app",
-  messagingSenderId: "250471340120",
-  appId: "1:250471340120:web:113ea0038cc49497c9122d",
-  measurementId: "G-PXG45EEKR4"
-};
+let stockActual = {};
+let tarifas = {};
+let listaPropiedades = {};
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const CLAVE_ACCESO = "2015";
 
-const form = document.getElementById("formAddProduct");
-const stockContainer = document.getElementById("stockContainer");
-const summaryContainer = document.getElementById("summaryContainer");
-const filterInput = document.getElementById("filterInput");
+function solicitarClave() {
+    const claveIngresada = prompt("Introduce la clave para acceder:");
 
-let productos = [];
+    if (claveIngresada !== CLAVE_ACCESO) {
+        document.body.innerHTML =
+            '<h1 style="color:red;text-align:center;margin-top:50px;">ACCESO NO AUTORIZADO</h1>';
 
-document.querySelectorAll("nav button").forEach(btn => {
-  btn.addEventListener("click", () => {
-
-    document.querySelectorAll("main section").forEach(sec => {
-      sec.classList.remove("visible");
-    });
-
-    document.querySelectorAll("nav button").forEach(b => {
-      b.classList.remove("selected");
-    });
-
-    document.getElementById(btn.dataset.target).classList.add("visible");
-    btn.classList.add("selected");
-  });
-});
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const deposito = document.getElementById("depositoInput").value.trim();
-  const articulo = document.getElementById("articuloInput").value.trim();
-  const cantidad = parseInt(document.getElementById("cantidadInput").value);
-
-  if (!deposito || !articulo || !cantidad) {
-    alert("Completa todos los campos");
-    return;
-  }
-
-  try {
-
-    await addDoc(collection(db, "inventario"), {
-  deposito,
-  articulo,
-  cantidad
-});
-
-    form.reset();
-
-    cargarProductos();
-
-  } catch (error) {
-  console.error(error);
-  alert(error.message);
-}
-});
-
-async function cargarProductos() {
-
-  const snapshot = await getDocs(
-    collection(db, "inventario")
-  );
-
-  productos = [];
-
-  snapshot.forEach(doc => {
-
-    productos.push({
-      id: doc.id,
-      ...doc.data()
-    });
-
-  });
-
-  mostrarProductos();
-  mostrarResumen();
+        throw new Error("Clave incorrecta");
+    }
 }
 
-function mostrarProductos() {
+function guardarLocal() {
+    localStorage.setItem(
+        "inventarioOficina",
+        JSON.stringify(stockActual)
+    );
 
-  const filtro = filterInput.value.toLowerCase();
+    localStorage.setItem(
+        "preciosOficina",
+        JSON.stringify(tarifas)
+    );
 
-  stockContainer.innerHTML = "";
-
-  productos
-    .filter(p => p.articulo.toLowerCase().includes(filtro))
-    .forEach(p => {
-
-      stockContainer.innerHTML += `
-        <div>
-          <strong>${p.articulo}</strong><br>
-          Depósito: ${p.deposito}<br>
-          Cantidad: ${p.cantidad}
-          <hr>
-        </div>
-      `;
-
-    });
+    localStorage.setItem(
+        "propiedadesOficina",
+        JSON.stringify(listaPropiedades)
+    );
 }
 
-function mostrarResumen() {
+function inicializarDatos() {
 
-  const resumen = {};
+    stockActual =
+        JSON.parse(
+            localStorage.getItem("inventarioOficina")
+        ) || {};
 
-  productos.forEach(p => {
+    tarifas =
+        JSON.parse(
+            localStorage.getItem("preciosOficina")
+        ) || {};
 
-    resumen[p.articulo] =
-      (resumen[p.articulo] || 0) + Number(p.cantidad);
-
-  });
-
-  let html = `
-    <table border="1">
-      <tr>
-        <th>Artículo</th>
-        <th>Total</th>
-      </tr>
-  `;
-
-  for (const articulo in resumen) {
-
-    html += `
-      <tr>
-        <td>${articulo}</td>
-        <td>${resumen[articulo]}</td>
-      </tr>
-    `;
-  }
-
-  html += "</table>";
-
-  summaryContainer.innerHTML = html;
+    listaPropiedades =
+        JSON.parse(
+            localStorage.getItem("propiedadesOficina")
+        ) || {
+            "Terreno Norte": {
+                liberacion: 1000,
+                gobierno: 1500
+            },
+            "Estación Central": {
+                liberacion: 5000,
+                gobierno: 8000
+            }
+        };
 }
 
-filterInput.addEventListener("input", mostrarProductos);
+function cambiarSeccion(seccionId) {
 
-cargarProductos();
+    document
+        .querySelectorAll("main section")
+        .forEach(sec => sec.classList.remove("visible"));
+
+    document
+        .getElementById(seccionId)
+        .classList.add("visible");
+
+    document
+        .querySelectorAll("nav button")
+        .forEach(btn => btn.classList.remove("selected"));
+
+    document
+        .querySelector(
+            `nav button[data-target="${seccionId}"]`
+        )
+        .classList.add("selected");
+
+    if (seccionId === "stockView") {
+        actualizarInventario();
+    }
+    else if (seccionId === "inventorySummary") {
+        generarResumen();
+    }
+    else if (seccionId === "propertyList") {
+        cargarPropiedades();
+    }
+}
+
+function actualizarInventario() {
+
+    const termino =
+        document
+            .getElementById("filterInput")
+            .value
+            .trim()
+            .toLowerCase();
+
+    let html = "";
+
+    for (const almacen in stockActual) {
+
+        let filas = "";
+
+        for (const item in stockActual[almacen]) {
+
+            if (
+                item
+                .toLowerCase()
+                .includes(termino)
+            ) {
+
+                filas += `
+                <tr>
+                    <td>${item}</td>
+                    <td>${stockActual[almacen][item]}</td>
+                    <td>
+                        <button
+                            class="small-action secondary"
+                            onclick="retirarUnidades('${almacen}','${item}')">
+                            Quitar
+                        </button>
+
+                        <button
+                            class="small-action"
+                            onclick="eliminarItem('${almacen}','${item}')">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+                `;
+            }
+        }
+
+        if (filas) {
+
+            html += `
+            <h3>Depósito: ${almacen}</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Artículo</th>
+                        <th>Cantidad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    ${filas}
+                </tbody>
+            </table>
+            `;
+        }
+    }
+
+    document.getElementById("stockContainer").innerHTML =
+        html ||
+        "<p>No hay artículos que coincidan con el filtro.</p>";
+}
+
+function insertarProducto(e) {
+
+    e.preventDefault();
+
+    const deposito =
+        document
+            .getElementById("depositoInput")
+            .value
+            .trim();
+
+    const nombreArticulo =
+        document
+            .getElementById("articuloInput")
+            .value
+            .trim();
+
+    const cantidad =
+        parseInt(
+            document.getElementById("cantidadInput").value,
+            10
+        );
+
+    if (
+        !deposito ||
+        !nombreArticulo ||
+        isNaN(cantidad) ||
+        cantidad < 1
+    ) {
+        alert("Por favor ingresa datos válidos.");
+        return;
+    }
+
+    if (!stockActual[deposito]) {
+        stockActual[deposito] = {};
+    }
+
+    stockActual[deposito][nombreArticulo] =
+        (stockActual[deposito][nombreArticulo] || 0)
+        + cantidad;
+
+    guardarLocal();
+    actualizarInventario();
+
+    e.target.reset();
+}
