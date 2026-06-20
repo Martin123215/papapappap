@@ -72,9 +72,6 @@ function renderizar() {
 
   const texto = filtro.value.toLowerCase();
 
-  const tabs =
-    document.getElementById("depositTabs");
-
   const depositos = {};
 
   Object.keys(productos).forEach(id => {
@@ -99,36 +96,49 @@ function renderizar() {
 
   });
 
-  const nombres = Object.keys(depositos);
+  let html = "";
 
-  if (
-    !depositoActivo &&
-    nombres.length > 0
-  ) {
-    depositoActivo = nombres[0];
+  Object.keys(depositos).forEach(nombreDeposito => {
+
+    html += `
+      <h2 style="color:gold;margin-top:20px;">
+        📦 ${nombreDeposito}
+      </h2>
+
+      <table>
+        <tr>
+          <th>Artículo</th>
+          <th>Cantidad</th>
+          <th>Acción</th>
+        </tr>
+    `;
+
+    depositos[nombreDeposito].forEach(item => {
+
+      html += `
+        <tr>
+          <td>${item.articulo}</td>
+          <td>${item.cantidad}</td>
+          <td>
+            <button onclick="eliminarProducto('${item.id}')">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `
+      </table>
+    `;
+  });
+
+  if (html === "") {
+    html = "<p>No hay productos.</p>";
   }
 
-  tabs.innerHTML = "";
-
-  nombres.forEach(nombre => {
-
-    const btn =
-      document.createElement("button");
-
-    btn.className =
-      "deposit-tab" +
-      (nombre === depositoActivo
-        ? " active"
-        : "");
-
-    btn.textContent = nombre;
-
-    btn.onclick = () => {
-
-      depositoActivo = nombre;
-
-      renderizar();
-    };
+  stockContainer.innerHTML = html;
+}
 
     tabs.appendChild(btn);
   });
