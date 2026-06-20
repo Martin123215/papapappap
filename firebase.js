@@ -11,8 +11,7 @@ const firebaseConfig = {
   projectId: "inventario-701cb",
   storageBucket: "inventario-701cb.firebasestorage.app",
   messagingSenderId: "579997039165",
-  appId: "1:579997039165:web:e32117e3fab909a9c60854",
-  measurementId: "G-WNBENR7SGY"
+  appId: "1:579997039165:web:e32117e3fab909a9c60854"
 };
 
 const app = initializeApp(firebaseConfig);
