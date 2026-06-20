@@ -243,3 +243,49 @@ p {
   }
 
 }
+body{
+    background:#111;
+    color:white;
+    font-family:Arial;
+    margin:0;
+    padding:20px;
+}
+
+header{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+h1{
+    color:gold;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    box-sizing:border-box;
+}
+
+button{
+    padding:10px 15px;
+    background:gold;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th,td{
+    border:1px solid #444;
+    padding:10px;
+}
+
+tr:nth-child(even){
+    background:#1d1d1d;
+}
