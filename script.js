@@ -1,132 +1,121 @@
 import { db } from "./firebase.js";
 
 import {
-collection,
-addDoc,
-getDocs,
-deleteDoc,
-doc,
-updateDoc,
-onSnapshot
-}
-from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+  ref,
+  push,
+  remove,
+  onValue
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
 const CLAVE = "2015";
 
-const clave = prompt("Ingrese la clave");
+const clave = prompt("Ingrese la clave de acceso");
 
-if(clave !== CLAVE){
-
-document.body.innerHTML =
-"<h1>ACCESO DENEGADO</h1>";
-
-throw new Error();
+if (clave !== CLAVE) {
+  document.body.innerHTML =
+    "<h1 style='text-align:center;color:red'>ACCESO DENEGADO</h1>";
+  throw new Error("Acceso denegado");
 }
 
-const stockContainer =
-document.getElementById("stockContainer");
+const form = document.getElementById("formAddProduct");
+const filtro = document.getElementById("filterInput");
+const stockContainer = document.getElementById("stockContainer");
 
-const form =
-document.getElementById("formAddProduct");
+const productosRef = ref(db, "productos");
 
-const filtro =
-document.getElementById("filterInput");
+let productos = {};
 
-const productosRef =
-collection(db,"productos");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-form.addEventListener("submit",async(e)=>{
+  const deposito =
+    document.getElementById("depositoInput").value.trim();
 
-e.preventDefault();
+  const articulo =
+    document.getElementById("articuloInput").value.trim();
 
-const deposito =
-document.getElementById("depositoInput").value;
+  const cantidad =
+    parseInt(
+      document.getElementById("cantidadInput").value,
+      10
+    );
 
-const articulo =
-document.getElementById("articuloInput").value;
+  if (!deposito || !articulo || isNaN(cantidad)) {
+    alert("Completa todos los campos");
+    return;
+  }
 
-const cantidad =
-parseInt(
-document.getElementById("cantidadInput").value
-);
+  await push(productosRef, {
+    deposito,
+    articulo,
+    cantidad
+  });
 
-await addDoc(productosRef,{
-deposito,
-articulo,
-cantidad
+  form.reset();
 });
 
-form.reset();
+function renderizar() {
 
-});
+  const texto = filtro.value.toLowerCase();
 
-onSnapshot(productosRef,(snapshot)=>{
+  let html = `
+    <table>
+      <tr>
+        <th>Depósito</th>
+        <th>Artículo</th>
+        <th>Cantidad</th>
+        <th>Acción</th>
+      </tr>
+  `;
 
-let html = `
-<table>
-<tr>
-<th>Depósito</th>
-<th>Artículo</th>
-<th>Cantidad</th>
-<th>Acción</th>
-</tr>
-`;
+  Object.keys(productos).forEach(id => {
 
-snapshot.forEach((item)=>{
+    const item = productos[id];
 
-const data = item.data();
+    if (
+      texto &&
+      !item.articulo.toLowerCase().includes(texto)
+    ) {
+      return;
+    }
 
-const texto =
-filtro.value.toLowerCase();
+    html += `
+      <tr>
+        <td>${item.deposito}</td>
+        <td>${item.articulo}</td>
+        <td>${item.cantidad}</td>
+        <td>
+          <button onclick="eliminarProducto('${id}')">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    `;
+  });
 
-if(
-data.articulo
-.toLowerCase()
-.includes(texto)
-){
+  html += "</table>";
 
-html += `
-<tr>
-
-<td>${data.deposito}</td>
-
-<td>${data.articulo}</td>
-
-<td>${data.cantidad}</td>
-
-<td>
-
-<button
-onclick="eliminar('${item.id}')">
-
-Eliminar
-
-</button>
-
-</td>
-
-</tr>
-`;
+  stockContainer.innerHTML = html;
 }
 
-});
+onValue(productosRef, (snapshot) => {
 
-html += "</table>";
+  productos = snapshot.val() || {};
 
-stockContainer.innerHTML = html;
-
-});
-
-filtro.addEventListener("input",()=>{
-
-location.reload();
+  renderizar();
 
 });
 
-window.eliminar = async(id)=>{
+filtro.addEventListener("input", renderizar);
 
-await deleteDoc(
-doc(db,"productos",id)
-);
+window.eliminarProducto = async function(id) {
+
+  if (!confirm("¿Eliminar producto?")) {
+    return;
+  }
+
+  await remove(
+    ref(db, "productos/" + id)
+  );
 
 };
