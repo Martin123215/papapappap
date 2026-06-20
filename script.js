@@ -49,12 +49,21 @@ try {
 
   console.log("Intentando guardar...");
 
+try {
+
   await push(productosRef, {
     deposito,
     articulo,
     cantidad
   });
 
+  console.log("Guardado correctamente");
+
+} catch (error) {
+
+  console.error("Error Firebase:", error);
+
+}
   console.log("Guardado correctamente");
 
   form.reset();
