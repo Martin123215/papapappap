@@ -417,3 +417,141 @@ function cargarPropiedades() {
         </tr>
         `;
     }
+        tabla += `
+        </tbody>
+
+        <tfoot>
+            <tr style="font-weight:bold;">
+                <td>Total</td>
+
+                <td>
+                    $${totalLib.toFixed(2)}
+                </td>
+
+                <td>
+                    $${totalGob.toFixed(2)}
+                </td>
+
+                <td></td>
+            </tr>
+        </tfoot>
+
+    </table>
+    `;
+
+    document.getElementById(
+        "propertiesContainer"
+    ).innerHTML = tabla;
+}
+
+function nuevaPropiedad(e) {
+
+    e.preventDefault();
+
+    const nombre =
+        document
+            .getElementById("propNameInput")
+            .value
+            .trim();
+
+    const lib =
+        parseFloat(
+            document.getElementById(
+                "propLiberacionInput"
+            ).value
+        );
+
+    const gob =
+        parseFloat(
+            document.getElementById(
+                "propGobiernoInput"
+            ).value
+        );
+
+    if (
+        !nombre ||
+        isNaN(lib) ||
+        isNaN(gob) ||
+        lib < 0 ||
+        gob < 0
+    ) {
+        alert(
+            "Por favor introduce datos válidos para la propiedad."
+        );
+        return;
+    }
+
+    listaPropiedades[nombre] = {
+        liberacion: lib,
+        gobierno: gob
+    };
+
+    guardarLocal();
+
+    cargarPropiedades();
+
+    e.target.reset();
+}
+
+window.quitarPropiedad = function(nombre) {
+
+    if (
+        confirm(
+            `¿Seguro quieres eliminar la propiedad "${nombre}"?`
+        )
+    ) {
+
+        delete listaPropiedades[nombre];
+
+        guardarLocal();
+
+        cargarPropiedades();
+    }
+};
+
+document
+    .querySelectorAll("nav button")
+    .forEach(btn =>
+        btn.addEventListener(
+            "click",
+            () => cambiarSeccion(btn.dataset.target)
+        )
+    );
+
+document
+    .getElementById("formAddProduct")
+    .addEventListener(
+        "submit",
+        insertarProducto
+    );
+
+document
+    .getElementById("filterInput")
+    .addEventListener(
+        "input",
+        actualizarInventario
+    );
+
+document
+    .getElementById("formAddProperty")
+    .addEventListener(
+        "submit",
+        nuevaPropiedad
+    );
+
+try {
+
+    solicitarClave();
+
+    inicializarDatos();
+
+    cambiarSeccion("stockView");
+
+}
+catch (_) {
+
+    // Clave incorrecta
+
+}
+
+})();
