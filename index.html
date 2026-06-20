@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THE SUPPLIER</title>
+<title>THE SUPPLIER PRO</title>
 
 <link rel="stylesheet" href="style.css">
 </head>
@@ -11,50 +11,29 @@
 <body>
 
 <header>
-    <h1>THE SUPPLIER</h1>
+  <h1>📦 THE SUPPLIER PRO</h1>
 </header>
 
 <main>
 
-    <h2>Inventario</h2>
+<section class="panel">
 
-    <form id="formAddProduct">
+  <form id="formAddProduct">
 
-        <input
-            type="text"
-            id="depositoInput"
-            placeholder="Depósito"
-            required
-        >
+    <input id="depositoInput" type="text" placeholder="Depósito">
+    <input id="articuloInput" type="text" placeholder="Artículo">
+    <input id="cantidadInput" type="number" placeholder="Cantidad">
 
-        <input
-            type="text"
-            id="articuloInput"
-            placeholder="Artículo"
-            required
-        >
+    <button type="submit">➕ Agregar</button>
 
-        <input
-            type="number"
-            id="cantidadInput"
-            placeholder="Cantidad"
-            required
-        >
+  </form>
 
-        <button type="submit">
-            Guardar
-        </button>
+  <input id="filterInput" type="text" placeholder="Buscar artículo...">
 
-    </form>
+  <div id="depositTabs"></div>
+  <div id="stockContainer"></div>
 
-    <input
-        type="text"
-        id="filterInput"
-        placeholder="Buscar artículo..."
-    >
-
-    <div id="depositTabs"></div>
-    <div id="stockContainer"></div>
+</section>
 
 </main>
 
