@@ -29,17 +29,50 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    await push(productosRef, {
-      deposito,
-      articulo,
-      cantidad
+    const snapshot = await new Promise((resolve) => {
+      onValue(productosRef, resolve, { onlyOnce: true });
     });
 
-    console.log("Guardado correctamente");
+    const data = snapshot.val() || {};
+
+    let encontradoId = null;
+
+    Object.keys(data).forEach(id => {
+      const item = data[id];
+
+      if (
+        item.deposito.toLowerCase() === deposito.toLowerCase() &&
+        item.articulo.toLowerCase() === articulo.toLowerCase()
+      ) {
+        encontradoId = id;
+      }
+    });
+
+    if (encontradoId) {
+      // SUMAR cantidad
+      const itemRef = ref(db, "productos/" + encontradoId);
+
+      await remove(itemRef); // eliminamos el viejo
+
+      await push(productosRef, {
+        deposito,
+        articulo,
+        cantidad: data[encontradoId].cantidad + cantidad
+      });
+
+    } else {
+      // NUEVO
+      await push(productosRef, {
+        deposito,
+        articulo,
+        cantidad
+      });
+    }
+
     form.reset();
 
   } catch (error) {
-    console.error("ERROR FIREBASE:", error);
+    console.error(error);
   }
 });
 
