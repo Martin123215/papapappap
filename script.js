@@ -209,3 +209,211 @@ function insertarProducto(e) {
 
     e.target.reset();
 }
+window.retirarUnidades = function (deposito, producto) {
+
+    let cantidad = prompt(
+        `¿Cuántas unidades deseas quitar de "${producto}" en "${deposito}"?`
+    );
+
+    cantidad = parseInt(cantidad, 10);
+
+    if (isNaN(cantidad) || cantidad < 1) {
+        return;
+    }
+
+    stockActual[deposito][producto] -= cantidad;
+
+    if (stockActual[deposito][producto] <= 0) {
+        delete stockActual[deposito][producto];
+    }
+
+    if (Object.keys(stockActual[deposito]).length === 0) {
+        delete stockActual[deposito];
+    }
+
+    guardarLocal();
+    actualizarInventario();
+};
+
+window.eliminarItem = function (deposito, producto) {
+
+    if (
+        confirm(
+            `¿Seguro deseas eliminar "${producto}" del depósito "${deposito}"?`
+        )
+    ) {
+
+        delete stockActual[deposito][producto];
+
+        if (Object.keys(stockActual[deposito]).length === 0) {
+            delete stockActual[deposito];
+        }
+
+        guardarLocal();
+        actualizarInventario();
+    }
+};
+
+function generarResumen() {
+
+    const acumulado = {};
+
+    for (const deposito in stockActual) {
+
+        for (const item in stockActual[deposito]) {
+
+            acumulado[item] =
+                (acumulado[item] || 0)
+                + stockActual[deposito][item];
+        }
+    }
+
+    let total = 0;
+
+    let tabla = `
+    <table>
+
+        <thead>
+            <tr>
+                <th>Artículo</th>
+                <th>Cantidad Total</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+
+        <tbody>
+    `;
+
+    for (const item in acumulado) {
+
+        const precio =
+            tarifas[item] ?? 0;
+
+        const subtotal =
+            acumulado[item] * precio;
+
+        total += subtotal;
+
+        tabla += `
+        <tr>
+
+            <td>${item}</td>
+
+            <td>
+                ${acumulado[item]}
+            </td>
+
+            <td>
+                <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value="${precio}"
+                    onchange="modificarPrecio('${item}', this.value)"
+                >
+            </td>
+
+            <td>
+                $${subtotal.toFixed(2)}
+            </td>
+
+        </tr>
+        `;
+    }
+
+    tabla += `
+        </tbody>
+
+        <tfoot>
+            <tr style="font-weight:bold;">
+                <td colspan="3">
+                    Total General
+                </td>
+
+                <td>
+                    $${total.toFixed(2)}
+                </td>
+            </tr>
+        </tfoot>
+
+    </table>
+    `;
+
+    document.getElementById(
+        "summaryContainer"
+    ).innerHTML = tabla;
+}
+
+window.modificarPrecio = function (
+    item,
+    nuevoValor
+) {
+
+    const nuevo =
+        parseFloat(nuevoValor);
+
+    if (!isNaN(nuevo) && nuevo >= 0) {
+
+        tarifas[item] = nuevo;
+
+        guardarLocal();
+
+        generarResumen();
+    }
+};
+
+function cargarPropiedades() {
+
+    let totalLib = 0;
+    let totalGob = 0;
+
+    let tabla = `
+    <table>
+
+        <thead>
+            <tr>
+                <th>Propiedad</th>
+                <th>Precio Liberación</th>
+                <th>Precio Gobierno</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+    `;
+
+    for (const nombre in listaPropiedades) {
+
+        const {
+            liberacion,
+            gobierno
+        } = listaPropiedades[nombre];
+
+        totalLib += liberacion;
+        totalGob += gobierno;
+
+        tabla += `
+        <tr>
+
+            <td>${nombre}</td>
+
+            <td>
+                $${liberacion.toFixed(2)}
+            </td>
+
+            <td>
+                $${gobierno.toFixed(2)}
+            </td>
+
+            <td>
+                <button
+                    class="small-action"
+                    onclick="quitarPropiedad('${nombre}')">
+                    Eliminar
+                </button>
+            </td>
+
+        </tr>
+        `;
+    }
