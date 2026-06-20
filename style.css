@@ -289,3 +289,24 @@ th,td{
 tr:nth-child(even){
     background:#1d1d1d;
 }
+#depositTabs{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:20px 0;
+}
+
+.deposit-tab{
+    background:#222;
+    color:white;
+    border:1px solid gold;
+    padding:10px 15px;
+    cursor:pointer;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.deposit-tab.active{
+    background:gold;
+    color:black;
+}
