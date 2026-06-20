@@ -148,43 +148,6 @@ function renderizar() {
 
   stockContainer.innerHTML = html;
 }
-
-    tabs.appendChild(btn);
-  });
-
-  let html = `
-    <table>
-      <tr>
-        <th>Artículo</th>
-        <th>Cantidad</th>
-        <th>Acción</th>
-      </tr>
-  `;
-
-  if (depositos[depositoActivo]) {
-
-    depositos[depositoActivo]
-      .forEach(item => {
-
-      html += `
-        <tr>
-          <td>${item.articulo}</td>
-          <td>${item.cantidad}</td>
-          <td>
-            <button onclick="eliminarProducto('${item.id}')">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      `;
-    });
-  }
-
-  html += "</table>";
-
-  stockContainer.innerHTML = html;
-}
-
 filtro.addEventListener("input", renderizar);
 
 window.eliminarProducto = async function(id) {
