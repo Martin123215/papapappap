@@ -11,11 +11,11 @@ const CLAVE = "2015";
 
 const clave = prompt("Ingrese la clave de acceso");
 
-if (clave !== CLAVE) {
-  document.body.innerHTML =
-    "<h1 style='text-align:center;color:red'>ACCESO DENEGADO</h1>";
-  throw new Error("Acceso denegado");
-}
+//if (clave !== CLAVE) {
+//  document.body.innerHTML =
+//    "<h1 style='text-align:center;color:red'>ACCESO DENEGADO</h1>";
+//  throw new Error("Acceso denegado");
+//}
 
 const form = document.getElementById("formAddProduct");
 const filtro = document.getElementById("filterInput");
