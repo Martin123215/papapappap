@@ -3,6 +3,7 @@ import { db } from "./firebase.js";
 import {
   ref,
   push,
+  update,
   remove,
   onValue
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
@@ -10,148 +11,162 @@ import {
 const form = document.getElementById("formAddProduct");
 const filtro = document.getElementById("filterInput");
 const stockContainer = document.getElementById("stockContainer");
+const tabsContainer = document.getElementById("depositTabs");
 
 const productosRef = ref(db, "productos");
 
 let productos = {};
+let depositoActivo = null;
 
-// GUARDAR
+/* =========================
+   GUARDAR (PRO - SIN DUPLICADOS)
+========================= */
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const deposito = document.getElementById("depositoInput").value.trim();
   const articulo = document.getElementById("articuloInput").value.trim();
-  const cantidad = parseInt(document.getElementById("cantidadInput").value, 10);
+  const cantidad = parseInt(document.getElementById("cantidadInput").value);
 
-  if (!deposito || !articulo || isNaN(cantidad)) {
-    alert("Completa todos los campos");
-    return;
-  }
+  if (!deposito || !articulo || isNaN(cantidad)) return;
 
-  try {
-    const snapshot = await new Promise((resolve) => {
-      onValue(productosRef, resolve, { onlyOnce: true });
-    });
+  const snapshot = await new Promise(r =>
+    onValue(productosRef, r, { onlyOnce: true })
+  );
 
-    const data = snapshot.val() || {};
+  const data = snapshot.val() || {};
 
-    let encontradoId = null;
+  let idExistente = null;
 
-    Object.keys(data).forEach(id => {
-      const item = data[id];
+  Object.keys(data).forEach(id => {
+    const item = data[id];
 
-      if (
-        item.deposito.toLowerCase() === deposito.toLowerCase() &&
-        item.articulo.toLowerCase() === articulo.toLowerCase()
-      ) {
-        encontradoId = id;
-      }
-    });
-
-    if (encontradoId) {
-      // SUMAR cantidad
-      const itemRef = ref(db, "productos/" + encontradoId);
-
-      await remove(itemRef); // eliminamos el viejo
-
-      await push(productosRef, {
-        deposito,
-        articulo,
-        cantidad: data[encontradoId].cantidad + cantidad
-      });
-
-    } else {
-      // NUEVO
-      await push(productosRef, {
-        deposito,
-        articulo,
-        cantidad
-      });
+    if (
+      item.deposito.toLowerCase() === deposito.toLowerCase() &&
+      item.articulo.toLowerCase() === articulo.toLowerCase()
+    ) {
+      idExistente = id;
     }
+  });
 
-    form.reset();
-
-  } catch (error) {
-    console.error(error);
+  if (idExistente) {
+    await update(ref(db, "productos/" + idExistente), {
+      cantidad: data[idExistente].cantidad + cantidad
+    });
+  } else {
+    await push(productosRef, {
+      deposito,
+      articulo,
+      cantidad
+    });
   }
+
+  form.reset();
 });
 
-// CARGAR DATOS EN TIEMPO REAL (ESTO TE FALTABA)
-onValue(productosRef, (snapshot) => {
+/* =========================
+   CARGA EN TIEMPO REAL
+========================= */
+onValue(productosRef, (snap) => {
+  productos = snap.val() || {};
 
-  productos = snapshot.val() || {};
+  const deps = Object.values(productos).map(p => p.deposito);
+  const unicos = [...new Set(deps)];
 
-  renderizar();
+  if (!depositoActivo && unicos.length > 0) {
+    depositoActivo = unicos[0];
+  }
 
+  renderTabs(unicos);
+  render();
 });
 
-// FILTRO
-filtro.addEventListener("input", renderizar);
+/* =========================
+   TABS
+========================= */
+function renderTabs(deps) {
 
-// RENDER POR DEPÓSITOS
-function renderizar() {
+  tabsContainer.innerHTML = "";
+
+  deps.forEach(dep => {
+
+    const btn = document.createElement("button");
+    btn.className = "tab" + (dep === depositoActivo ? " active" : "");
+    btn.textContent = dep;
+
+    btn.onclick = () => {
+      depositoActivo = dep;
+      render();
+    };
+
+    tabsContainer.appendChild(btn);
+  });
+}
+
+/* =========================
+   RENDER
+========================= */
+function render() {
 
   const texto = filtro.value.toLowerCase();
-  const depositos = {};
+
+  let html = `
+    <table>
+      <tr>
+        <th>Artículo</th>
+        <th>Cantidad</th>
+        <th>Acciones</th>
+      </tr>
+  `;
 
   Object.keys(productos).forEach(id => {
 
     const item = productos[id];
 
-    if (texto && !item.articulo.toLowerCase().includes(texto)) {
-      return;
-    }
+    if (item.deposito !== depositoActivo) return;
 
-    if (!depositos[item.deposito]) {
-      depositos[item.deposito] = [];
-    }
-
-    depositos[item.deposito].push({ id, ...item });
-  });
-
-  let html = "";
-
-  Object.keys(depositos).forEach(nombreDeposito => {
+    if (texto && !item.articulo.toLowerCase().includes(texto)) return;
 
     html += `
-      <h2 style="color:gold;margin-top:20px;">
-        📦 ${nombreDeposito}
-      </h2>
-
-      <table>
-        <tr>
-          <th>Artículo</th>
-          <th>Cantidad</th>
-          <th>Acción</th>
-        </tr>
+      <tr>
+        <td>${item.articulo}</td>
+        <td>${item.cantidad}</td>
+        <td>
+          <button onclick="sumar('${id}', ${item.cantidad})">+</button>
+          <button onclick="restar('${id}', ${item.cantidad})">-</button>
+          <button onclick="eliminar('${id}')">🗑</button>
+        </td>
+      </tr>
     `;
-
-    depositos[nombreDeposito].forEach(item => {
-
-      html += `
-        <tr>
-          <td>${item.articulo}</td>
-          <td>${item.cantidad}</td>
-          <td>
-            <button onclick="eliminarProducto('${item.id}')">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      `;
-    });
-
-    html += `</table>`;
   });
 
-  stockContainer.innerHTML =
-    html || "<p>No hay productos</p>";
+  html += "</table>";
+
+  stockContainer.innerHTML = html;
 }
 
-// ELIMINAR
-window.eliminarProducto = async function(id) {
+/* =========================
+   ACCIONES PRO
+========================= */
+window.sumar = async (id, c) => {
+  await update(ref(db, "productos/" + id), {
+    cantidad: c + 1
+  });
+};
 
-  if (!confirm("¿Eliminar producto?")) return;
+window.restar = async (id, c) => {
+  if (c <= 1) {
+    await remove(ref(db, "productos/" + id));
+    return;
+  }
 
+  await update(ref(db, "productos/" + id), {
+    cantidad: c - 1
+  });
+};
+
+window.eliminar = async (id) => {
   await remove(ref(db, "productos/" + id));
 };
+
+filtro.addEventListener("input", render);
