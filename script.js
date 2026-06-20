@@ -45,11 +45,25 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+try {
+
+  console.log("Intentando guardar...");
+
   await push(productosRef, {
     deposito,
     articulo,
     cantidad
   });
+
+  console.log("Guardado correctamente");
+
+  form.reset();
+
+} catch (error) {
+
+  console.error("ERROR FIREBASE:", error);
+
+}
 
   form.reset();
 });
