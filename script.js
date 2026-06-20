@@ -72,15 +72,10 @@ function renderizar() {
 
   const texto = filtro.value.toLowerCase();
 
-  let html = `
-    <table>
-      <tr>
-        <th>Depósito</th>
-        <th>Artículo</th>
-        <th>Cantidad</th>
-        <th>Acción</th>
-      </tr>
-  `;
+  const tabs =
+    document.getElementById("depositTabs");
+
+  const depositos = {};
 
   Object.keys(productos).forEach(id => {
 
@@ -93,32 +88,83 @@ function renderizar() {
       return;
     }
 
-    html += `
-      <tr>
-        <td>${item.deposito}</td>
-        <td>${item.articulo}</td>
-        <td>${item.cantidad}</td>
-        <td>
-          <button onclick="eliminarProducto('${id}')">
-            Eliminar
-          </button>
-        </td>
-      </tr>
-    `;
+    if (!depositos[item.deposito]) {
+      depositos[item.deposito] = [];
+    }
+
+    depositos[item.deposito].push({
+      id,
+      ...item
+    });
+
   });
+
+  const nombres = Object.keys(depositos);
+
+  if (
+    !depositoActivo &&
+    nombres.length > 0
+  ) {
+    depositoActivo = nombres[0];
+  }
+
+  tabs.innerHTML = "";
+
+  nombres.forEach(nombre => {
+
+    const btn =
+      document.createElement("button");
+
+    btn.className =
+      "deposit-tab" +
+      (nombre === depositoActivo
+        ? " active"
+        : "");
+
+    btn.textContent = nombre;
+
+    btn.onclick = () => {
+
+      depositoActivo = nombre;
+
+      renderizar();
+    };
+
+    tabs.appendChild(btn);
+  });
+
+  let html = `
+    <table>
+      <tr>
+        <th>Artículo</th>
+        <th>Cantidad</th>
+        <th>Acción</th>
+      </tr>
+  `;
+
+  if (depositos[depositoActivo]) {
+
+    depositos[depositoActivo]
+      .forEach(item => {
+
+      html += `
+        <tr>
+          <td>${item.articulo}</td>
+          <td>${item.cantidad}</td>
+          <td>
+            <button onclick="eliminarProducto('${item.id}')">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  }
 
   html += "</table>";
 
   stockContainer.innerHTML = html;
 }
-
-onValue(productosRef, (snapshot) => {
-
-  productos = snapshot.val() || {};
-
-  renderizar();
-
-});
 
 filtro.addEventListener("input", renderizar);
 
