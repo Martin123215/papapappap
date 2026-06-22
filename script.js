@@ -1,172 +1,199 @@
-import { db } from "./firebase.js";
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
+}
 
-import {
-  ref,
-  push,
-  update,
-  remove,
-  onValue
-} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+body{
+    background:#080b12;
+    color:#fff;
+    min-height:100vh;
+}
 
-const form = document.getElementById("formAddProduct");
-const filtro = document.getElementById("filterInput");
-const stockContainer = document.getElementById("stockContainer");
-const tabsContainer = document.getElementById("depositTabs");
+header{
+    background:#111827;
+    border-bottom:2px solid #c1121f;
+    padding:20px;
+}
 
-const productosRef = ref(db, "productos");
+header h1{
+    color:#c1121f;
+    font-size:32px;
+    font-weight:700;
+}
 
-let productos = {};
-let depositoActivo = null;
+main{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
 
-/* =========================
-   GUARDAR (PRO - SIN DUPLICADOS)
-========================= */
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+.card{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 0 20px rgba(0,0,0,.4);
+}
 
-  const deposito = document.getElementById("depositoInput").value.trim();
-  const articulo = document.getElementById("articuloInput").value.trim();
-  const cantidad = parseInt(document.getElementById("cantidadInput").value);
+.card h2{
+    color:#fff;
+    margin-bottom:20px;
+}
 
-  if (!deposito || !articulo || isNaN(cantidad)) return;
+form{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:15px;
+}
 
-  const snapshot = await new Promise(r =>
-    onValue(productosRef, r, { onlyOnce: true })
-  );
+.input-group{
+    display:flex;
+    flex-direction:column;
+}
 
-  const data = snapshot.val() || {};
+.input-group label{
+    margin-bottom:8px;
+    color:#ccc;
+}
 
-  let idExistente = null;
+input{
+    background:#0f172a;
+    border:1px solid #374151;
+    color:white;
+    padding:12px;
+    border-radius:10px;
+    outline:none;
+}
 
-  Object.keys(data).forEach(id => {
-    const item = data[id];
+input:focus{
+    border-color:#c1121f;
+}
 
-    if (
-      item.deposito.toLowerCase() === deposito.toLowerCase() &&
-      item.articulo.toLowerCase() === articulo.toLowerCase()
-    ) {
-      idExistente = id;
+.btn-save{
+    background:#c1121f;
+    color:white;
+    border:none;
+    border-radius:10px;
+    padding:14px;
+    cursor:pointer;
+    font-weight:700;
+    transition:.3s;
+}
+
+.btn-save:hover{
+    background:#dc2626;
+}
+
+.search-box{
+    margin-bottom:20px;
+}
+
+.search-box input{
+    width:100%;
+}
+
+#depositTabs{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+
+.tab{
+    background:#1f2937;
+    border:1px solid #374151;
+    color:white;
+    padding:10px 20px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.tab:hover{
+    border-color:#c1121f;
+}
+
+.tab.active{
+    background:#c1121f;
+    border-color:#c1121f;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    overflow:hidden;
+    border-radius:10px;
+}
+
+th{
+    background:#1f2937;
+    padding:15px;
+    text-align:left;
+}
+
+td{
+    padding:15px;
+    border-bottom:1px solid #1f2937;
+}
+
+tr:hover{
+    background:#0f172a;
+}
+
+.btn-plus{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-right:5px;
+}
+
+.btn-minus{
+    background:#dc2626;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-right:5px;
+}
+
+.btn-delete{
+    background:#7f1d1d;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    color:#888;
+}
+
+@media(max-width:768px){
+
+    form{
+        grid-template-columns:1fr;
     }
-  });
 
-  if (idExistente) {
-    await update(ref(db, "productos/" + idExistente), {
-      cantidad: data[idExistente].cantidad + cantidad
-    });
-  } else {
-    await push(productosRef, {
-      deposito,
-      articulo,
-      cantidad
-    });
-  }
+    table{
+        font-size:14px;
+    }
 
-  form.reset();
-});
+    th,
+    td{
+        padding:10px;
+    }
 
-/* =========================
-   CARGA EN TIEMPO REAL
-========================= */
-onValue(productosRef, (snap) => {
-  productos = snap.val() || {};
-
-  const deps = Object.values(productos).map(p => p.deposito);
-  const unicos = [...new Set(deps)];
-
-  if (!depositoActivo && unicos.length > 0) {
-    depositoActivo = unicos[0];
-  }
-
-  renderTabs(unicos);
-  render();
-});
-
-/* =========================
-   TABS
-========================= */
-function renderTabs(deps) {
-
-  tabsContainer.innerHTML = "";
-
-  deps.forEach(dep => {
-
-    const btn = document.createElement("button");
-    btn.className = "tab" + (dep === depositoActivo ? " active" : "");
-    btn.textContent = dep;
-
-    btn.onclick = () => {
-      depositoActivo = dep;
-      render();
-    };
-
-    tabsContainer.appendChild(btn);
-  });
+    header h1{
+        font-size:24px;
+    }
 }
-
-/* =========================
-   RENDER
-========================= */
-function render() {
-
-  const texto = filtro.value.toLowerCase();
-
-  let html = `
-    <table>
-      <tr>
-        <th>Artículo</th>
-        <th>Cantidad</th>
-        <th>Acciones</th>
-      </tr>
-  `;
-
-  Object.keys(productos).forEach(id => {
-
-    const item = productos[id];
-
-    if (item.deposito !== depositoActivo) return;
-
-    if (texto && !item.articulo.toLowerCase().includes(texto)) return;
-
-    html += `
-      <tr>
-        <td>${item.articulo}</td>
-        <td>${item.cantidad}</td>
-        <td>
-          <button onclick="sumar('${id}', ${item.cantidad})">+</button>
-          <button onclick="restar('${id}', ${item.cantidad})">-</button>
-          <button onclick="eliminar('${id}')">🗑</button>
-        </td>
-      </tr>
-    `;
-  });
-
-  html += "</table>";
-
-  stockContainer.innerHTML = html;
-}
-
-/* =========================
-   ACCIONES PRO
-========================= */
-window.sumar = async (id, c) => {
-  await update(ref(db, "productos/" + id), {
-    cantidad: c + 1
-  });
-};
-
-window.restar = async (id, c) => {
-  if (c <= 1) {
-    await remove(ref(db, "productos/" + id));
-    return;
-  }
-
-  await update(ref(db, "productos/" + id), {
-    cantidad: c - 1
-  });
-};
-
-window.eliminar = async (id) => {
-  await remove(ref(db, "productos/" + id));
-};
-
-filtro.addEventListener("input", render);
