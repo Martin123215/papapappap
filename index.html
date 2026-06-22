@@ -3,39 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STF</title>
+
+<title>THE SUPPLIER PRO</title>
 
 <link rel="stylesheet" href="style.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
 
-<header>
-  <h1>📦 STF</h1>
+<header class="topbar">
+
+    <div class="logo-area">
+        <h1>THE SUPPLIER</h1>
+        <span>Sistema de Inventario</span>
+    </div>
+
+    <div class="status">
+        <span class="online-dot"></span>
+        Firebase Online
+    </div>
+
 </header>
 
 <main>
 
-<section class="panel">
+    <section class="card">
 
-  <form id="formAddProduct">
+        <h2>Registrar Producto</h2>
 
-    <input id="depositoInput" type="text" placeholder="Depósito">
-    <input id="articuloInput" type="text" placeholder="Artículo">
-    <input id="cantidadInput" type="number" placeholder="Cantidad">
+        <form id="formAddProduct">
 
-    <button type="submit">➕ Agregar</button>
+            <div class="input-group">
+                <label>Depósito</label>
+                <input
+                    type="text"
+                    id="depositoInput"
+                    placeholder="Ej: Bodega Central"
+                    required
+                >
+            </div>
 
-  </form>
+            <div class="input-group">
+                <label>Artículo</label>
+                <input
+                    type="text"
+                    id="articuloInput"
+                    placeholder="Ej: Chaleco"
+                    required
+                >
+            </div>
 
-  <input id="filterInput" type="text" placeholder="Buscar artículo...">
+            <div class="input-group">
+                <label>Cantidad</label>
+                <input
+                    type="number"
+                    id="cantidadInput"
+                    placeholder="0"
+                    required
+                >
+            </div>
 
-  <div id="depositTabs"></div>
-  <div id="stockContainer"></div>
+            <button type="submit" class="btn-save">
+                ➕ Guardar Producto
+            </button>
 
-</section>
+        </form>
+
+    </section>
+
+    <section class="card">
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="filterInput"
+                placeholder="🔎 Buscar artículo..."
+            >
+
+        </div>
+
+        <div id="depositTabs"></div>
+
+        <div id="stockContainer"></div>
+
+    </section>
 
 </main>
+
+<footer>
+    THE SUPPLIER © 2026
+</footer>
 
 <script type="module" src="firebase.js"></script>
 <script type="module" src="script.js"></script>
