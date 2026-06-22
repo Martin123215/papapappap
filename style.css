@@ -9,12 +9,12 @@ header{
   text-align:center;
   padding:20px;
   background:#1a1a1a;
-  border-bottom:2px solid gold;
+  border-bottom:2px solid #ff0000;
 }
 
 h1{
   margin:0;
-  color:gold;
+  color:#ff0000;
 }
 
 .panel{
@@ -37,7 +37,7 @@ input{
 
 button{
   padding:10px;
-  background:red;
+  background:#ff0000;
   border:none;
   font-weight:bold;
   cursor:pointer;
@@ -59,13 +59,13 @@ button{
 .tab{
   padding:8px 12px;
   background:#222;
-  border:1px solid gold;
+  border:1px solid #ff0000;
   cursor:pointer;
   border-radius:6px;
 }
 
 .tab.active{
-  background:gold;
+  background:#ff0000;
   color:black;
 }
 
