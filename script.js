@@ -1,199 +1,338 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Inter',sans-serif;
+import { db } from "./firebase.js";
+
+import {
+  ref,
+  push,
+  update,
+  remove,
+  onValue
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+
+const form = document.getElementById("formAddProduct");
+const filtro = document.getElementById("filterInput");
+const stockContainer = document.getElementById("stockContainer");
+const tabsContainer = document.getElementById("depositTabs");
+
+const productosRef = ref(db, "productos");
+
+let productos = {};
+let depositoActivo = null;
+
+/* =========================
+   ICONOS
+========================= */
+function obtenerIcono(nombre){
+
+  nombre = nombre.toLowerCase();
+
+  if(nombre.includes("chaleco")) return "🦺";
+  if(nombre.includes("radio")) return "📻";
+  if(nombre.includes("botiquin")) return "🩹";
+  if(nombre.includes("casco")) return "🪖";
+  if(nombre.includes("linterna")) return "🔦";
+  if(nombre.includes("esposas")) return "⛓️";
+
+  return "📦";
 }
 
-body{
-    background:#080b12;
-    color:#fff;
-    min-height:100vh;
-}
+/* =========================
+   GUARDAR PRODUCTO
+========================= */
+form.addEventListener("submit", async (e) => {
 
-header{
-    background:#111827;
-    border-bottom:2px solid #c1121f;
-    padding:20px;
-}
+  e.preventDefault();
 
-header h1{
-    color:#c1121f;
-    font-size:32px;
-    font-weight:700;
-}
+  const deposito =
+    document.getElementById("depositoInput").value.trim();
 
-main{
-    max-width:1200px;
-    margin:auto;
-    padding:20px;
-}
+  const articulo =
+    document.getElementById("articuloInput").value.trim();
 
-.card{
-    background:#111827;
-    border:1px solid #1f2937;
-    border-radius:15px;
-    padding:20px;
-    margin-bottom:20px;
-    box-shadow:0 0 20px rgba(0,0,0,.4);
-}
+  const cantidad =
+    parseInt(
+      document.getElementById("cantidadInput").value,
+      10
+    );
 
-.card h2{
-    color:#fff;
-    margin-bottom:20px;
-}
+  if (!deposito || !articulo || isNaN(cantidad)) {
+    alert("Completa todos los campos");
+    return;
+  }
 
-form{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:15px;
-}
+  try {
 
-.input-group{
-    display:flex;
-    flex-direction:column;
-}
+    const data = productos;
 
-.input-group label{
-    margin-bottom:8px;
-    color:#ccc;
-}
+    let productoExistente = null;
 
-input{
-    background:#0f172a;
-    border:1px solid #374151;
-    color:white;
-    padding:12px;
-    border-radius:10px;
-    outline:none;
-}
+    Object.keys(data).forEach(id => {
 
-input:focus{
-    border-color:#c1121f;
-}
+      const item = data[id];
 
-.btn-save{
-    background:#c1121f;
-    color:white;
-    border:none;
-    border-radius:10px;
-    padding:14px;
-    cursor:pointer;
-    font-weight:700;
-    transition:.3s;
-}
+      if (
+        item.deposito.toLowerCase() === deposito.toLowerCase() &&
+        item.articulo.toLowerCase() === articulo.toLowerCase()
+      ) {
+        productoExistente = {
+          id,
+          ...item
+        };
+      }
 
-.btn-save:hover{
-    background:#dc2626;
-}
+    });
 
-.search-box{
-    margin-bottom:20px;
-}
+    if (productoExistente) {
 
-.search-box input{
-    width:100%;
-}
+      await update(
+        ref(db, "productos/" + productoExistente.id),
+        {
+          cantidad:
+            productoExistente.cantidad + cantidad
+        }
+      );
 
-#depositTabs{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:20px;
-}
+    } else {
 
-.tab{
-    background:#1f2937;
-    border:1px solid #374151;
-    color:white;
-    padding:10px 20px;
-    border-radius:10px;
-    cursor:pointer;
-    transition:.3s;
-}
+      await push(productosRef, {
+        deposito,
+        articulo,
+        cantidad
+      });
 
-.tab:hover{
-    border-color:#c1121f;
-}
-
-.tab.active{
-    background:#c1121f;
-    border-color:#c1121f;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    overflow:hidden;
-    border-radius:10px;
-}
-
-th{
-    background:#1f2937;
-    padding:15px;
-    text-align:left;
-}
-
-td{
-    padding:15px;
-    border-bottom:1px solid #1f2937;
-}
-
-tr:hover{
-    background:#0f172a;
-}
-
-.btn-plus{
-    background:#16a34a;
-    color:white;
-    border:none;
-    padding:8px 12px;
-    border-radius:8px;
-    cursor:pointer;
-    margin-right:5px;
-}
-
-.btn-minus{
-    background:#dc2626;
-    color:white;
-    border:none;
-    padding:8px 12px;
-    border-radius:8px;
-    cursor:pointer;
-    margin-right:5px;
-}
-
-.btn-delete{
-    background:#7f1d1d;
-    color:white;
-    border:none;
-    padding:8px 12px;
-    border-radius:8px;
-    cursor:pointer;
-}
-
-footer{
-    text-align:center;
-    padding:20px;
-    color:#888;
-}
-
-@media(max-width:768px){
-
-    form{
-        grid-template-columns:1fr;
     }
 
-    table{
-        font-size:14px;
-    }
+    form.reset();
 
-    th,
-    td{
-        padding:10px;
-    }
+  } catch (error) {
 
-    header h1{
-        font-size:24px;
-    }
+    console.error(error);
+
+  }
+
+});
+
+/* =========================
+   CARGA EN TIEMPO REAL
+========================= */
+onValue(productosRef, (snapshot) => {
+
+  productos = snapshot.val() || {};
+
+  const depositos = [
+    ...new Set(
+      Object.values(productos)
+        .map(p => p.deposito)
+    )
+  ];
+
+  if (
+    !depositoActivo &&
+    depositos.length > 0
+  ) {
+    depositoActivo = depositos[0];
+  }
+
+  renderTabs(depositos);
+  renderizar();
+
+});
+
+/* =========================
+   PESTAÑAS
+========================= */
+function renderTabs(depositos) {
+
+  tabsContainer.innerHTML = "";
+
+  depositos.forEach(deposito => {
+
+    const btn =
+      document.createElement("button");
+
+    btn.className =
+      "tab" +
+      (
+        deposito === depositoActivo
+          ? " active"
+          : ""
+      );
+
+    btn.textContent = deposito;
+
+    btn.onclick = () => {
+
+      depositoActivo = deposito;
+
+      renderTabs(depositos);
+      renderizar();
+
+    };
+
+    tabsContainer.appendChild(btn);
+
+  });
+
 }
+
+/* =========================
+   RENDER INVENTARIO
+========================= */
+function renderizar() {
+
+  const texto =
+    filtro.value.toLowerCase();
+
+  let html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Artículo</th>
+          <th>Cantidad</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  Object.keys(productos).forEach(id => {
+
+    const item = productos[id];
+
+    if (
+      depositoActivo &&
+      item.deposito !== depositoActivo
+    ) {
+      return;
+    }
+
+    if (
+      texto &&
+      !item.articulo
+        .toLowerCase()
+        .includes(texto)
+    ) {
+      return;
+    }
+
+    html += `
+      <tr>
+        <td>
+          ${obtenerIcono(item.articulo)}
+          ${item.articulo}
+        </td>
+
+        <td>
+          ${item.cantidad}
+        </td>
+
+        <td>
+
+          <button
+            class="btn-plus"
+            onclick="sumar('${id}', ${item.cantidad})"
+          >
+            +
+          </button>
+
+          <button
+            class="btn-minus"
+            onclick="restar('${id}', ${item.cantidad})"
+          >
+            -
+          </button>
+
+          <button
+            class="btn-delete"
+            onclick="eliminarProducto('${id}')"
+          >
+            🗑
+          </button>
+
+        </td>
+      </tr>
+    `;
+
+  });
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+  stockContainer.innerHTML = html;
+
+}
+
+/* =========================
+   BUSCADOR
+========================= */
+filtro.addEventListener(
+  "input",
+  renderizar
+);
+
+/* =========================
+   SUMAR
+========================= */
+window.sumar = async (
+  id,
+  cantidadActual
+) => {
+
+  await update(
+    ref(db, "productos/" + id),
+    {
+      cantidad:
+        cantidadActual + 1
+    }
+  );
+
+};
+
+/* =========================
+   RESTAR
+========================= */
+window.restar = async (
+  id,
+  cantidadActual
+) => {
+
+  if (cantidadActual <= 1) {
+
+    await remove(
+      ref(db, "productos/" + id)
+    );
+
+    return;
+  }
+
+  await update(
+    ref(db, "productos/" + id),
+    {
+      cantidad:
+        cantidadActual - 1
+    }
+  );
+
+};
+
+/* =========================
+   ELIMINAR
+========================= */
+window.eliminarProducto = async (
+  id
+) => {
+
+  if (
+    !confirm(
+      "¿Eliminar producto?"
+    )
+  ) {
+    return;
+  }
+
+  await remove(
+    ref(db, "productos/" + id)
+  );
+
+};
