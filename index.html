@@ -21,7 +21,7 @@
 
 <div class="app">
 
-    <!-- MENU -->
+    <!-- MENU LATERAL -->
     <aside class="sidebar">
 
         <div class="logo">
@@ -29,7 +29,7 @@
             <h1>STF</h1>
 
             <span>
-                Sistema Inventario
+                Sistema de Inventario
             </span>
 
         </div>
@@ -58,7 +58,7 @@
         <!-- ALMACENES -->
         <section id="almacenes" class="section">
 
-            <h2>
+            <h2 class="section-title">
                 🏢 Almacenes
             </h2>
 
@@ -107,8 +107,28 @@
         >
 
             <h2>
-                💰 Precios
+                💰 Gestión de Precios
             </h2>
+
+            <div class="create-card">
+
+                <input
+                    type="text"
+                    id="nombrePrecio"
+                    placeholder="Nombre del artículo"
+                >
+
+                <input
+                    type="number"
+                    id="valorPrecio"
+                    placeholder="Precio"
+                >
+
+                <button id="btnGuardarPrecio">
+                    💾 Guardar
+                </button>
+
+            </div>
 
             <div id="listaPrecios"></div>
 
@@ -125,7 +145,21 @@
                 📊 Estadísticas
             </h2>
 
-            <div id="estadisticasContenido"></div>
+            <div id="estadisticasContenido">
+
+                <div class="card">
+                    <h3>
+                        Valor Total de Inventario
+                    </h3>
+
+                    <h1 id="totalGeneral">
+                        $0
+                    </h1>
+                </div>
+
+                <div id="detalleEstadisticas"></div>
+
+            </div>
 
         </section>
 
@@ -133,6 +167,7 @@
 
 </div>
 
+<script type="module" src="firebase.js"></script>
 <script type="module" src="script.js"></script>
 
 </body>
