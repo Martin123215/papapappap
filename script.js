@@ -336,3 +336,127 @@ window.eliminarProducto = async (
   );
 
 };
+/* =========================
+   Crea Almacenes 
+========================= */
+const almacenesRef = ref(db, "almacenes");
+
+const formAlmacen =
+document.getElementById("formAlmacen");
+
+const listaAlmacenes =
+document.getElementById("listaAlmacenes");
+
+formAlmacen.addEventListener(
+  "submit",
+  async (e) => {
+
+    e.preventDefault();
+
+    const nombre =
+      document
+      .getElementById("nombreAlmacen")
+      .value
+      .trim();
+
+    if(!nombre) return;
+
+    await push(
+      almacenesRef,
+      {
+        nombre
+      }
+    );
+
+    formAlmacen.reset();
+
+  }
+);
+
+onValue(
+  almacenesRef,
+  (snapshot) => {
+
+    const almacenes =
+      snapshot.val() || {};
+
+    cargarSelectAlmacenes(almacenes);
+    mostrarAlmacenes(almacenes);
+
+  }
+);
+
+function cargarSelectAlmacenes(
+  almacenes
+){
+
+  const select =
+    document.getElementById(
+      "depositoInput"
+    );
+
+  select.innerHTML = "";
+
+  Object.keys(almacenes)
+  .forEach(id => {
+
+    select.innerHTML += `
+      <option>
+        ${almacenes[id].nombre}
+      </option>
+    `;
+
+  });
+
+}
+
+function mostrarAlmacenes(
+  almacenes
+){
+
+  let html = "";
+
+  Object.keys(almacenes)
+  .forEach(id => {
+
+    html += `
+      <div class="almacen-card">
+
+        📦 ${almacenes[id].nombre}
+
+        <button
+          onclick="eliminarAlmacen('${id}')"
+        >
+          Eliminar
+        </button>
+
+      </div>
+    `;
+
+  });
+
+  listaAlmacenes.innerHTML =
+    html;
+
+}
+
+window.eliminarAlmacen =
+async function(id){
+
+  if(
+    !confirm(
+      "¿Eliminar almacén?"
+    )
+  ){
+    return;
+  }
+
+  await remove(
+    ref(
+      db,
+      "almacenes/" + id
+    )
+  );
+
+};
+
