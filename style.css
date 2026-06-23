@@ -466,3 +466,181 @@ footer{
 .btn-view:hover{
     background:#1d4ed8;
 }
+
+/* =========================
+   MENU LATERAL
+========================= */
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+.sidebar{
+    width:260px;
+    background:#111827;
+    border-right:2px solid #c1121f;
+    padding:25px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.logo{
+    margin-bottom:25px;
+}
+
+.logo h1{
+    color:#c1121f;
+    font-size:34px;
+}
+
+.logo span{
+    color:#94a3b8;
+    font-size:14px;
+}
+
+.sidebar button{
+    background:#1f2937;
+    color:white;
+    border:none;
+    padding:14px;
+    border-radius:10px;
+    cursor:pointer;
+    text-align:left;
+    transition:.3s;
+    font-size:16px;
+}
+
+.sidebar button:hover{
+    background:#c1121f;
+}
+
+.content{
+    flex:1;
+    padding:25px;
+}
+
+/* =========================
+   SECCIONES
+========================= */
+
+.section{
+    animation:fade .3s ease;
+}
+
+@keyframes fade{
+
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+/* =========================
+   INVENTARIO
+========================= */
+
+#tituloInventario{
+    margin-bottom:20px;
+    color:#fff;
+}
+
+#inventarioContenido{
+    background:#111827;
+    border-radius:15px;
+    padding:20px;
+    border:1px solid #1f2937;
+}
+
+/* =========================
+   PRECIOS
+========================= */
+
+#listaPrecios{
+    margin-top:20px;
+}
+
+.precio-card{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:10px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.precio-info{
+    display:flex;
+    gap:15px;
+    align-items:center;
+}
+
+/* =========================
+   ESTADISTICAS
+========================= */
+
+#estadisticasContenido{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.total-card{
+    background:#111827;
+    border:2px solid #c1121f;
+    border-radius:15px;
+    padding:25px;
+    text-align:center;
+}
+
+.total-card h1{
+    color:#c1121f;
+    font-size:42px;
+    margin-top:10px;
+}
+
+.estadistica-item{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:12px;
+    padding:15px;
+
+    display:flex;
+    justify-content:space-between;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:900px){
+
+    .app{
+        flex-direction:column;
+    }
+
+    .sidebar{
+        width:100%;
+        border-right:none;
+        border-bottom:2px solid #c1121f;
+    }
+
+    .sidebar button{
+        width:100%;
+    }
+
+    .content{
+        padding:15px;
+    }
+
+}
