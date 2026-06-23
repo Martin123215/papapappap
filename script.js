@@ -74,6 +74,10 @@ onValue(
 
     render();
 
+if(almacenActivo){
+  renderInventario();
+}
+
   }
 );
 
