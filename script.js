@@ -20,6 +20,7 @@ const listaAlmacenes =
 document.getElementById("listaAlmacenes");
 
 let almacenes = {};
+let almacenActivo = null;
 
 btnCrearAlmacen.addEventListener(
   "click",
