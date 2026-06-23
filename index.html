@@ -23,22 +23,29 @@
         <h1>STF</h1>
         <span>Sistema de Inventario</span>
     </div>
-<h2>Almacenes</h2>
+<section class="almacenes-section">
 
-<form id="formAlmacen">
+    <h2 class="section-title">
+        🏢 Almacenes
+    </h2>
 
-    <input
-        type="text"
-        id="nombreAlmacen"
-        placeholder="Nombre del almacén"
-        required
-    >
+    <div class="create-card">
 
-    <button type="submit">
-        Crear almacén
-    </button>
+        <input
+            type="text"
+            id="nombreAlmacen"
+            placeholder="Nombre del almacén"
+        >
 
-</form>
+        <button id="btnCrearAlmacen">
+            ➕ Crear almacén
+        </button>
+
+    </div>
+
+    <div id="listaAlmacenes"></div>
+
+</section>
 
 <div id="listaAlmacenes"></div>
     <div class="status">
