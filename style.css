@@ -444,3 +444,25 @@ footer{
 .btn-delete-small:hover{
     background:#b91c1c;
 }
+.btn-delete-small{
+    background:#7f1d1d;
+    color:white;
+    border:none;
+    width:45px;
+    height:45px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.btn-view{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.btn-view:hover{
+    background:#1d4ed8;
+}
