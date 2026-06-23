@@ -19,55 +19,119 @@
 
 <body>
 
-<header class="topbar">
+<div class="app">
 
-    <div class="logo-area">
+    <!-- MENU -->
+    <aside class="sidebar">
 
-        <h1>STF</h1>
+        <div class="logo">
 
-        <span>
-            Sistema de Inventario
-        </span>
+            <h1>STF</h1>
 
-    </div>
-
-</header>
-
-<main>
-
-    <section class="almacenes-section">
-
-        <h2 class="section-title">
-            🏢 Almacenes
-        </h2>
-
-        <div class="create-card">
-
-            <input
-                type="text"
-                id="nombreAlmacen"
-                placeholder="Nombre del almacén"
-            >
-
-            <button
-                id="btnCrearAlmacen"
-            >
-                ➕ Crear almacén
-            </button>
+            <span>
+                Sistema Inventario
+            </span>
 
         </div>
 
-        <div id="listaAlmacenes"></div>
+        <button onclick="mostrarSeccion('almacenes')">
+            🏢 Almacenes
+        </button>
 
-    </section>
+        <button onclick="mostrarSeccion('inventario')">
+            📦 Inventario
+        </button>
 
-</main>
+        <button onclick="mostrarSeccion('precios')">
+            💰 Precios
+        </button>
 
-<footer>
+        <button onclick="mostrarSeccion('estadisticas')">
+            📊 Estadísticas
+        </button>
 
-    STF © 2026
+    </aside>
 
-</footer>
+    <!-- CONTENIDO -->
+    <main class="content">
+
+        <!-- ALMACENES -->
+        <section id="almacenes" class="section">
+
+            <h2>
+                🏢 Almacenes
+            </h2>
+
+            <div class="create-card">
+
+                <input
+                    type="text"
+                    id="nombreAlmacen"
+                    placeholder="Nombre del almacén"
+                >
+
+                <button id="btnCrearAlmacen">
+                    ➕ Crear almacén
+                </button>
+
+            </div>
+
+            <div id="listaAlmacenes"></div>
+
+        </section>
+
+        <!-- INVENTARIO -->
+        <section
+            id="inventario"
+            class="section"
+            style="display:none;"
+        >
+
+            <h2>
+                📦 Inventario
+            </h2>
+
+            <h3 id="tituloInventario">
+                Selecciona un almacén
+            </h3>
+
+            <div id="inventarioContenido"></div>
+
+        </section>
+
+        <!-- PRECIOS -->
+        <section
+            id="precios"
+            class="section"
+            style="display:none;"
+        >
+
+            <h2>
+                💰 Precios
+            </h2>
+
+            <div id="listaPrecios"></div>
+
+        </section>
+
+        <!-- ESTADISTICAS -->
+        <section
+            id="estadisticas"
+            class="section"
+            style="display:none;"
+        >
+
+            <h2>
+                📊 Estadísticas
+            </h2>
+
+            <div id="estadisticasContenido"></div>
+
+        </section>
+
+    </main>
+
+</div>
 
 <script type="module" src="script.js"></script>
 
