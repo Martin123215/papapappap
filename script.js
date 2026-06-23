@@ -341,104 +341,148 @@ window.eliminarProducto = async (
 ========================= */
 const almacenesRef = ref(db, "almacenes");
 
-const formAlmacen =
-document.getElementById("formAlmacen");
+const btnCrearAlmacen =
+document.getElementById(
+  "btnCrearAlmacen"
+);
+
+const nombreAlmacenInput =
+document.getElementById(
+  "nombreAlmacen"
+);
 
 const listaAlmacenes =
-document.getElementById("listaAlmacenes");
+document.getElementById(
+  "listaAlmacenes"
+);
 
-formAlmacen.addEventListener(
-  "submit",
-  async (e) => {
-
-    e.preventDefault();
+btnCrearAlmacen.addEventListener(
+  "click",
+  async () => {
 
     const nombre =
-      document
-      .getElementById("nombreAlmacen")
-      .value
-      .trim();
+      nombreAlmacenInput.value.trim();
 
-    if(!nombre) return;
+    if(!nombre){
+      alert(
+        "Ingresa un nombre"
+      );
+      return;
+    }
 
     await push(
       almacenesRef,
       {
-        nombre
+        nombre,
+        fecha:
+          new Date()
+          .toLocaleDateString()
       }
     );
 
-    formAlmacen.reset();
+    nombreAlmacenInput.value = "";
 
   }
 );
 
 onValue(
   almacenesRef,
-  (snapshot) => {
+  (snapshot)=>{
 
     const almacenes =
       snapshot.val() || {};
 
-    cargarSelectAlmacenes(almacenes);
-    mostrarAlmacenes(almacenes);
+    renderAlmacenes(
+      almacenes
+    );
 
   }
 );
 
-function cargarSelectAlmacenes(
-  almacenes
-){
-
-  const select =
-    document.getElementById(
-      "depositoInput"
-    );
-
-  select.innerHTML = "";
-
-  Object.keys(almacenes)
-  .forEach(id => {
-
-    select.innerHTML += `
-      <option>
-        ${almacenes[id].nombre}
-      </option>
-    `;
-
-  });
-
-}
-
-function mostrarAlmacenes(
+function renderAlmacenes(
   almacenes
 ){
 
   let html = "";
 
   Object.keys(almacenes)
-  .forEach(id => {
+  .forEach(id=>{
+
+    const almacen =
+      almacenes[id];
 
     html += `
-      <div class="almacen-card">
 
-        📦 ${almacenes[id].nombre}
+      <div class="warehouse-card">
 
-        <button
-          onclick="eliminarAlmacen('${id}')"
-        >
-          Eliminar
-        </button>
+        <div class="warehouse-left">
+
+          <div class="warehouse-icon">
+            🏢
+          </div>
+
+          <div class="warehouse-info">
+
+            <h3>
+              ${almacen.nombre}
+            </h3>
+
+            <span>
+              Creado:
+              ${almacen.fecha || ""}
+            </span>
+
+          </div>
+
+        </div>
+
+        <div class="warehouse-actions">
+
+          <button
+            class="btn-view"
+            onclick="seleccionarAlmacen('${almacen.nombre}')"
+          >
+            Ver
+          </button>
+
+          <button
+            class="btn-delete"
+            onclick="eliminarAlmacen('${id}')"
+          >
+            Eliminar
+          </button>
+
+        </div>
 
       </div>
-    `;
 
+    `;
   });
 
   listaAlmacenes.innerHTML =
     html;
 
 }
+
+window.seleccionarAlmacen =
+function(nombre){
+
+  const select =
+    document.getElementById(
+      "depositoInput"
+    );
+
+  if(select){
+    select.value = nombre;
+  }
+
+  window.scrollTo({
+    top:
+      document.body.scrollHeight,
+    behavior:"smooth"
+  });
+
+};
 
 window.eliminarAlmacen =
 async function(id){
@@ -459,4 +503,3 @@ async function(id){
   );
 
 };
-
