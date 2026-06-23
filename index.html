@@ -1,175 +1,156 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>STF Inventario</title><link rel="stylesheet" href="style.css"><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></head><body><div class="app"><!-- MENU -->
+<aside class="sidebar">
 
-<head>
+    <div class="logo">
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <h1>STF</h1>
 
-<title>STF</title>
+        <span>
+            Sistema de Inventario
+        </span>
 
-<link rel="stylesheet" href="style.css">
+    </div>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <button onclick="mostrarSeccion('almacenes')">
+        🏢 Almacenes
+    </button>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <button onclick="mostrarSeccion('inventario')">
+        📦 Inventario
+    </button>
 
-</head>
+    <button onclick="mostrarSeccion('precios')">
+        💰 Precios
+    </button>
 
-<body>
+    <button onclick="mostrarSeccion('estadisticas')">
+        📊 Estadísticas
+    </button>
 
-<div class="app">
+</aside>
 
-    <!-- MENU LATERAL -->
-    <aside class="sidebar">
+<!-- CONTENIDO -->
+<main class="content">
 
-        <div class="logo">
+    <!-- ALMACENES -->
+    <section
+        id="almacenes"
+        class="section"
+    >
 
-            <h1>STF</h1>
+        <h2 class="section-title">
+            🏢 Almacenes
+        </h2>
 
-            <span>
-                Sistema de Inventario
-            </span>
+        <div class="create-card">
+
+            <input
+                type="text"
+                id="nombreAlmacen"
+                placeholder="Nombre del almacén"
+            >
+
+            <button
+                id="btnCrearAlmacen"
+            >
+                ➕ Crear almacén
+            </button>
 
         </div>
 
-        <button onclick="mostrarSeccion('almacenes')">
-            🏢 Almacenes
-        </button>
+        <div id="listaAlmacenes"></div>
 
-        <button onclick="mostrarSeccion('inventario')">
+    </section>
+
+    <!-- INVENTARIO -->
+    <section
+        id="inventario"
+        class="section"
+        style="display:none;"
+    >
+
+        <h2>
             📦 Inventario
-        </button>
+        </h2>
 
-        <button onclick="mostrarSeccion('precios')">
-            💰 Precios
-        </button>
+        <h3 id="tituloInventario">
+            Selecciona un almacén
+        </h3>
 
-        <button onclick="mostrarSeccion('estadisticas')">
+        <div id="inventarioContenido"></div>
+
+    </section>
+
+    <!-- PRECIOS -->
+    <section
+        id="precios"
+        class="section"
+        style="display:none;"
+    >
+
+        <h2>
+            💰 Gestión de Precios
+        </h2>
+
+        <div class="create-card">
+
+            <input
+                type="text"
+                id="nombrePrecio"
+                placeholder="Nombre del artículo"
+            >
+
+            <input
+                type="number"
+                id="valorPrecio"
+                placeholder="Precio"
+            >
+
+            <button
+                id="btnGuardarPrecio"
+            >
+                💾 Guardar Precio
+            </button>
+
+        </div>
+
+        <div id="listaPrecios"></div>
+
+    </section>
+
+    <!-- ESTADISTICAS -->
+    <section
+        id="estadisticas"
+        class="section"
+        style="display:none;"
+    >
+
+        <h2>
             📊 Estadísticas
-        </button>
+        </h2>
 
-    </aside>
+        <div id="estadisticasContenido">
 
-    <!-- CONTENIDO -->
-    <main class="content">
+            <div class="total-card">
 
-        <!-- ALMACENES -->
-        <section id="almacenes" class="section">
+                <h3>
+                    Valor Total del Inventario
+                </h3>
 
-            <h2 class="section-title">
-                🏢 Almacenes
-            </h2>
-
-            <div class="create-card">
-
-                <input
-                    type="text"
-                    id="nombreAlmacen"
-                    placeholder="Nombre del almacén"
-                >
-
-                <button id="btnCrearAlmacen">
-                    ➕ Crear almacén
-                </button>
+                <h1 id="totalGeneral">
+                    $0
+                </h1>
 
             </div>
 
-            <div id="listaAlmacenes"></div>
+            <div id="detalleEstadisticas"></div>
 
-        </section>
+        </div>
 
-        <!-- INVENTARIO -->
-        <section
-            id="inventario"
-            class="section"
-            style="display:none;"
-        >
+    </section>
 
-            <h2>
-                📦 Inventario
-            </h2>
+</main>
 
-            <h3 id="tituloInventario">
-                Selecciona un almacén
-            </h3>
-
-            <div id="inventarioContenido"></div>
-
-        </section>
-
-        <!-- PRECIOS -->
-        <section
-            id="precios"
-            class="section"
-            style="display:none;"
-        >
-
-            <h2>
-                💰 Gestión de Precios
-            </h2>
-
-            <div class="create-card">
-
-                <input
-                    type="text"
-                    id="nombrePrecio"
-                    placeholder="Nombre del artículo"
-                >
-
-                <input
-                    type="number"
-                    id="valorPrecio"
-                    placeholder="Precio"
-                >
-
-                <button id="btnGuardarPrecio">
-                    💾 Guardar
-                </button>
-
-            </div>
-
-            <div id="listaPrecios"></div>
-
-        </section>
-
-        <!-- ESTADISTICAS -->
-        <section
-            id="estadisticas"
-            class="section"
-            style="display:none;"
-        >
-
-            <h2>
-                📊 Estadísticas
-            </h2>
-
-            <div id="estadisticasContenido">
-
-                <div class="card">
-                    <h3>
-                        Valor Total de Inventario
-                    </h3>
-
-                    <h1 id="totalGeneral">
-                        $0
-                    </h1>
-                </div>
-
-                <div id="detalleEstadisticas"></div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-</div>
-
-<script type="module" src="firebase.js"></script>
-<script type="module" src="script.js"></script>
-
-</body>
-
-</html>
+</div><script type="module" src="script.js"></script></body></html>
