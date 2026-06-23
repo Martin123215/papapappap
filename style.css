@@ -416,3 +416,31 @@ footer{
     }
 
 }
+
+.btn-view{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.btn-view:hover{
+    background:#1d4ed8;
+}
+
+.btn-delete-small{
+    background:#991b1b;
+    color:white;
+    border:none;
+    padding:8px 10px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.btn-delete-small:hover{
+    background:#b91c1c;
+}
