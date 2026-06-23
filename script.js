@@ -123,47 +123,6 @@ function render(){
         </div>
 
       </div>
-    `;
-
-    if(almacenActivo === idAlmacen){
-
-      html += `
-
-      <div class="almacen-card">
-
-        <form
-          class="product-form"
-          onsubmit="agregarProducto(event,'${idAlmacen}')"
-        >
-
-          <input
-            type="text"
-            id="articulo-${idAlmacen}"
-            placeholder="Artículo"
-            required
-          >
-
-          <input
-            type="number"
-            id="cantidad-${idAlmacen}"
-            placeholder="Cantidad"
-            required
-          >
-
-          <button
-            class="btn-save"
-            type="submit"
-          >
-            Agregar
-          </button>
-
-        </form>
-
-        ${renderProductos(idAlmacen)}
-
-      </div>
-
-      `;
     }
 
   });
