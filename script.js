@@ -3,484 +3,341 @@ import { db } from "./firebase.js";
 import {
   ref,
   push,
-  update,
   remove,
+  update,
   onValue
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
-const form = document.getElementById("formAddProduct");
-const filtro = document.getElementById("filterInput");
-const stockContainer = document.getElementById("stockContainer");
-const tabsContainer = document.getElementById("depositTabs");
-
-const productosRef = ref(db, "productos");
-
-let productos = {};
-let depositoActivo = null;
-
-/* =========================
-   ICONOS
-========================= */
-function obtenerIcono(nombre){
-
-  nombre = nombre.toLowerCase();
-
-  if(nombre.includes("chaleco")) return "🦺";
-  if(nombre.includes("radio")) return "📻";
-  if(nombre.includes("botiquin")) return "🩹";
-  if(nombre.includes("casco")) return "🪖";
-  if(nombre.includes("linterna")) return "🔦";
-  if(nombre.includes("esposas")) return "⛓️";
-
-  return "📦";
-}
-
-/* =========================
-   GUARDAR PRODUCTO
-========================= */
-form.addEventListener("submit", async (e) => {
-
-  e.preventDefault();
-
-  const deposito =
-    document.getElementById("depositoInput").value.trim();
-
-  const articulo =
-    document.getElementById("articuloInput").value.trim();
-
-  const cantidad =
-    parseInt(
-      document.getElementById("cantidadInput").value,
-      10
-    );
-
-  if (!deposito || !articulo || isNaN(cantidad)) {
-    alert("Completa todos los campos");
-    return;
-  }
-
-  try {
-
-    const data = productos;
-
-    let productoExistente = null;
-
-    Object.keys(data).forEach(id => {
-
-      const item = data[id];
-
-      if (
-        item.deposito.toLowerCase() === deposito.toLowerCase() &&
-        item.articulo.toLowerCase() === articulo.toLowerCase()
-      ) {
-        productoExistente = {
-          id,
-          ...item
-        };
-      }
-
-    });
-
-    if (productoExistente) {
-
-      await update(
-        ref(db, "productos/" + productoExistente.id),
-        {
-          cantidad:
-            productoExistente.cantidad + cantidad
-        }
-      );
-
-    } else {
-
-      await push(productosRef, {
-        deposito,
-        articulo,
-        cantidad
-      });
-
-    }
-
-    form.reset();
-
-  } catch (error) {
-
-    console.error(error);
-
-  }
-
-});
-
-/* =========================
-   CARGA EN TIEMPO REAL
-========================= */
-onValue(productosRef, (snapshot) => {
-
-  productos = snapshot.val() || {};
-
-  const depositos = [
-    ...new Set(
-      Object.values(productos)
-        .map(p => p.deposito)
-    )
-  ];
-
-  if (
-    !depositoActivo &&
-    depositos.length > 0
-  ) {
-    depositoActivo = depositos[0];
-  }
-
-  renderTabs(depositos);
-  renderizar();
-
-});
-
-/* =========================
-   PESTAÑAS
-========================= */
-function renderTabs(depositos) {
-
-  tabsContainer.innerHTML = "";
-
-  depositos.forEach(deposito => {
-
-    const btn =
-      document.createElement("button");
-
-    btn.className =
-      "tab" +
-      (
-        deposito === depositoActivo
-          ? " active"
-          : ""
-      );
-
-    btn.textContent = deposito;
-
-    btn.onclick = () => {
-
-      depositoActivo = deposito;
-
-      renderTabs(depositos);
-      renderizar();
-
-    };
-
-    tabsContainer.appendChild(btn);
-
-  });
-
-}
-
-/* =========================
-   RENDER INVENTARIO
-========================= */
-function renderizar() {
-
-  const texto =
-    filtro.value.toLowerCase();
-
-  let html = `
-    <table>
-      <thead>
-        <tr>
-          <th>Artículo</th>
-          <th>Cantidad</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-  Object.keys(productos).forEach(id => {
-
-    const item = productos[id];
-
-    if (
-      depositoActivo &&
-      item.deposito !== depositoActivo
-    ) {
-      return;
-    }
-
-    if (
-      texto &&
-      !item.articulo
-        .toLowerCase()
-        .includes(texto)
-    ) {
-      return;
-    }
-
-    html += `
-      <tr>
-        <td>
-          ${obtenerIcono(item.articulo)}
-          ${item.articulo}
-        </td>
-
-        <td>
-          ${item.cantidad}
-        </td>
-
-        <td>
-
-          <button
-            class="btn-plus"
-            onclick="sumar('${id}', ${item.cantidad})"
-          >
-            +
-          </button>
-
-          <button
-            class="btn-minus"
-            onclick="restar('${id}', ${item.cantidad})"
-          >
-            -
-          </button>
-
-          <button
-            class="btn-delete"
-            onclick="eliminarProducto('${id}')"
-          >
-            🗑
-          </button>
-
-        </td>
-      </tr>
-    `;
-
-  });
-
-  html += `
-      </tbody>
-    </table>
-  `;
-
-  stockContainer.innerHTML = html;
-
-}
-
-/* =========================
-   BUSCADOR
-========================= */
-filtro.addEventListener(
-  "input",
-  renderizar
-);
-
-/* =========================
-   SUMAR
-========================= */
-window.sumar = async (
-  id,
-  cantidadActual
-) => {
-
-  await update(
-    ref(db, "productos/" + id),
-    {
-      cantidad:
-        cantidadActual + 1
-    }
-  );
-
-};
-
-/* =========================
-   RESTAR
-========================= */
-window.restar = async (
-  id,
-  cantidadActual
-) => {
-
-  if (cantidadActual <= 1) {
-
-    await remove(
-      ref(db, "productos/" + id)
-    );
-
-    return;
-  }
-
-  await update(
-    ref(db, "productos/" + id),
-    {
-      cantidad:
-        cantidadActual - 1
-    }
-  );
-
-};
-
-/* =========================
-   ELIMINAR
-========================= */
-window.eliminarProducto = async (
-  id
-) => {
-
-  if (
-    !confirm(
-      "¿Eliminar producto?"
-    )
-  ) {
-    return;
-  }
-
-  await remove(
-    ref(db, "productos/" + id)
-  );
-
-};
-/* =========================
-   Crea Almacenes 
-========================= */
 const almacenesRef = ref(db, "almacenes");
 
 const btnCrearAlmacen =
-document.getElementById(
-  "btnCrearAlmacen"
-);
+document.getElementById("btnCrearAlmacen");
 
-const nombreAlmacenInput =
-document.getElementById(
-  "nombreAlmacen"
-);
+const nombreAlmacen =
+document.getElementById("nombreAlmacen");
 
 const listaAlmacenes =
-document.getElementById(
-  "listaAlmacenes"
-);
+document.getElementById("listaAlmacenes");
+
+let almacenes = {};
 
 btnCrearAlmacen.addEventListener(
   "click",
   async () => {
 
     const nombre =
-      nombreAlmacenInput.value.trim();
+    nombreAlmacen.value.trim();
 
     if(!nombre){
-      alert(
-        "Ingresa un nombre"
-      );
+      alert("Ingresa un nombre");
       return;
     }
 
     await push(
       almacenesRef,
       {
-        nombre,
-        fecha:
-          new Date()
-          .toLocaleDateString()
+        nombre
       }
     );
 
-    nombreAlmacenInput.value = "";
+    nombreAlmacen.value = "";
 
   }
 );
 
 onValue(
   almacenesRef,
-  (snapshot)=>{
+  snapshot => {
 
-    const almacenes =
-      snapshot.val() || {};
+    almacenes =
+    snapshot.val() || {};
 
-    renderAlmacenes(
-      almacenes
-    );
+    render();
 
   }
 );
 
-function renderAlmacenes(
-  almacenes
-){
+function render(){
 
   let html = "";
 
   Object.keys(almacenes)
-  .forEach(id=>{
+  .forEach(idAlmacen => {
 
     const almacen =
-      almacenes[id];
+    almacenes[idAlmacen];
 
     html += `
 
-      <div class="warehouse-card">
+    <div class="almacen-card">
 
-        <div class="warehouse-left">
+      <div class="almacen-header">
 
-          <div class="warehouse-icon">
-            🏢
-          </div>
+        <h3>
+          🏢 ${almacen.nombre}
+        </h3>
 
-          <div class="warehouse-info">
-
-            <h3>
-              ${almacen.nombre}
-            </h3>
-
-            <span>
-              Creado:
-              ${almacen.fecha || ""}
-            </span>
-
-          </div>
-
-        </div>
-
-        <div class="warehouse-actions">
-
-          <button
-            class="btn-view"
-            onclick="seleccionarAlmacen('${almacen.nombre}')"
-          >
-            Ver
-          </button>
-
-          <button
-            class="btn-delete"
-            onclick="eliminarAlmacen('${id}')"
-          >
-            Eliminar
-          </button>
-
-        </div>
+        <button
+          class="btn-delete"
+          onclick="eliminarAlmacen('${idAlmacen}')"
+        >
+          Eliminar
+        </button>
 
       </div>
+
+      <form
+        class="product-form"
+        onsubmit="agregarProducto(event,'${idAlmacen}')"
+      >
+
+        <input
+          type="text"
+          id="articulo-${idAlmacen}"
+          placeholder="Artículo"
+          required
+        >
+
+        <input
+          type="number"
+          id="cantidad-${idAlmacen}"
+          placeholder="Cantidad"
+          required
+        >
+
+        <button
+          class="btn-save"
+          type="submit"
+        >
+          Agregar
+        </button>
+
+      </form>
+
+      ${renderProductos(idAlmacen)}
+
+    </div>
 
     `;
   });
 
-  listaAlmacenes.innerHTML =
-    html;
+  listaAlmacenes.innerHTML = html;
 
 }
 
-window.seleccionarAlmacen =
-function(nombre){
+function renderProductos(idAlmacen){
 
-  const select =
-    document.getElementById(
-      "depositoInput"
-    );
+  const almacen =
+  almacenes[idAlmacen];
 
-  if(select){
-    select.value = nombre;
+  if(!almacen.productos){
+    return "<p>Sin productos</p>";
   }
 
-  window.scrollTo({
-    top:
-      document.body.scrollHeight,
-    behavior:"smooth"
+  let html = "";
+
+  Object.keys(
+    almacen.productos
+  ).forEach(idProducto => {
+
+    const p =
+    almacen.productos[idProducto];
+
+    html += `
+
+    <div class="producto">
+
+      <div class="producto-info">
+
+        <span>📦</span>
+
+        <span>
+          ${p.articulo}
+        </span>
+
+        <strong>
+          ${p.cantidad}
+        </strong>
+
+      </div>
+
+      <div class="producto-actions">
+
+        <button
+          class="btn-plus"
+          onclick="sumar('${idAlmacen}','${idProducto}',${p.cantidad})"
+        >
+          +
+        </button>
+
+        <button
+          class="btn-minus"
+          onclick="restar('${idAlmacen}','${idProducto}',${p.cantidad})"
+        >
+          -
+        </button>
+
+        <button
+          class="btn-delete"
+          onclick="eliminarProducto('${idAlmacen}','${idProducto}')"
+        >
+          🗑
+        </button>
+
+      </div>
+
+    </div>
+
+    `;
   });
+
+  return html;
+}
+
+window.agregarProducto =
+async function(
+  e,
+  idAlmacen
+){
+
+  e.preventDefault();
+
+  const articulo =
+  document
+  .getElementById(
+    `articulo-${idAlmacen}`
+  )
+  .value
+  .trim();
+
+  const cantidad =
+  parseInt(
+    document
+    .getElementById(
+      `cantidad-${idAlmacen}`
+    )
+    .value
+  );
+
+  const productos =
+  almacenes[idAlmacen]
+  .productos || {};
+
+  let existente = null;
+
+  Object.keys(productos)
+  .forEach(id => {
+
+    if(
+      productos[id]
+      .articulo
+      .toLowerCase()
+      ===
+      articulo.toLowerCase()
+    ){
+      existente = {
+        id,
+        ...productos[id]
+      };
+    }
+
+  });
+
+  if(existente){
+
+    await update(
+      ref(
+        db,
+        `almacenes/${idAlmacen}/productos/${existente.id}`
+      ),
+      {
+        cantidad:
+        existente.cantidad +
+        cantidad
+      }
+    );
+
+  }else{
+
+    await push(
+      ref(
+        db,
+        `almacenes/${idAlmacen}/productos`
+      ),
+      {
+        articulo,
+        cantidad
+      }
+    );
+
+  }
+
+};
+
+window.sumar =
+async function(
+  idAlmacen,
+  idProducto,
+  cantidad
+){
+
+  await update(
+    ref(
+      db,
+      `almacenes/${idAlmacen}/productos/${idProducto}`
+    ),
+    {
+      cantidad:
+      cantidad + 1
+    }
+  );
+
+};
+
+window.restar =
+async function(
+  idAlmacen,
+  idProducto,
+  cantidad
+){
+
+  if(cantidad <= 1){
+
+    await remove(
+      ref(
+        db,
+        `almacenes/${idAlmacen}/productos/${idProducto}`
+      )
+    );
+
+    return;
+  }
+
+  await update(
+    ref(
+      db,
+      `almacenes/${idAlmacen}/productos/${idProducto}`
+    ),
+    {
+      cantidad:
+      cantidad - 1
+    }
+  );
+
+};
+
+window.eliminarProducto =
+async function(
+  idAlmacen,
+  idProducto
+){
+
+  await remove(
+    ref(
+      db,
+      `almacenes/${idAlmacen}/productos/${idProducto}`
+    )
+  );
 
 };
 
