@@ -83,6 +83,15 @@ onValue(
       almacenActivo =
       Object.keys(almacenes)[0];
     }
+onValue(preciosRef, snapshot => {
+
+  precios =
+  snapshot.val() || {};
+
+  renderPrecios();
+  renderEstadisticas();
+
+});
 
     render();
 
