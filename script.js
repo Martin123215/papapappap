@@ -412,3 +412,75 @@ window.verAlmacen = function(idAlmacen){
   renderInventario();
 
 };
+
+window.mostrarSeccion = function(id){
+
+  document
+  .querySelectorAll(".section")
+  .forEach(sec => {
+
+    sec.style.display = "none";
+
+  });
+
+  document
+  .getElementById(id)
+  .style.display = "block";
+
+};
+
+function renderInventario(){
+
+  if(
+    !almacenActivo ||
+    !almacenes[almacenActivo]
+  ){
+    return;
+  }
+
+  const almacen =
+  almacenes[almacenActivo];
+
+  tituloInventario.innerHTML =
+  "🏢 " + almacen.nombre;
+
+  let html = `
+
+  <form
+    class="product-form"
+    onsubmit="agregarProducto(event,'${almacenActivo}')"
+  >
+
+    <input
+      type="text"
+      id="articulo-${almacenActivo}"
+      placeholder="Artículo"
+      required
+    >
+
+    <input
+      type="number"
+      id="cantidad-${almacenActivo}"
+      placeholder="Cantidad"
+      required
+    >
+
+    <button
+      class="btn-save"
+      type="submit"
+    >
+      Agregar
+    </button>
+
+  </form>
+
+  `;
+
+  html += renderProductos(
+    almacenActivo
+  );
+
+  inventarioContenido.innerHTML =
+  html;
+
+}
