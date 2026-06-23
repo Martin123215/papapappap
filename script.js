@@ -89,40 +89,41 @@ function render(){
 
     const almacen = almacenes[idAlmacen];
 
-    html += `
-      <div class="warehouse-card">
+html += `
+<div class="warehouse-card">
 
-        <div class="warehouse-left">
+  <div class="warehouse-left">
 
-          <div class="warehouse-icon">
-            🏢
-          </div>
+    <div class="warehouse-icon">
+      🏢
+    </div>
 
-          <div class="warehouse-info">
-            <h3>${almacen.nombre}</h3>
-          </div>
+    <div class="warehouse-info">
+      <h3>${almacen.nombre}</h3>
+    </div>
 
-        </div>
+  </div>
 
-        <div class="warehouse-actions">
+  <div class="warehouse-actions">
 
-          <button
-            class="btn-view"
-            onclick="verAlmacen('${idAlmacen}')"
-          >
-            👁 Ver
-          </button>
+    <button
+      class="btn-view"
+      onclick="verAlmacen('${idAlmacen}')"
+    >
+      👁 Ver
+    </button>
 
-          <button
-            class="btn-delete-small"
-            onclick="eliminarAlmacen('${idAlmacen}')"
-          >
-            🗑
-          </button>
+    <button
+      class="btn-delete-small"
+      onclick="eliminarAlmacen('${idAlmacen}')"
+    >
+      🗑
+    </button>
 
-        </div>
+  </div>
 
-      </div>
+</div>
+`;
     }
 
   });
