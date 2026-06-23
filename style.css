@@ -335,3 +335,84 @@ footer{
     }
 
 }
+
+.almacen-card{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.almacen-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.almacen-header h3{
+    color:white;
+}
+
+.product-form{
+    display:grid;
+    grid-template-columns:2fr 1fr auto;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.product-form input{
+    padding:12px;
+}
+
+.producto{
+    background:#0f172a;
+    border-radius:10px;
+    padding:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.producto-info{
+    display:flex;
+    gap:15px;
+    align-items:center;
+}
+
+.producto-actions{
+    display:flex;
+    gap:5px;
+}
+
+.producto-actions button{
+    border:none;
+    border-radius:8px;
+    padding:8px 12px;
+    cursor:pointer;
+}
+
+.btn-plus{
+    background:#16a34a;
+    color:white;
+}
+
+.btn-minus{
+    background:#dc2626;
+    color:white;
+}
+
+.btn-delete{
+    background:#7f1d1d;
+    color:white;
+}
+
+@media(max-width:768px){
+
+    .product-form{
+        grid-template-columns:1fr;
+    }
+
+}
