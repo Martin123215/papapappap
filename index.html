@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -23,31 +25,7 @@
         <h1>STF</h1>
         <span>Sistema de Inventario</span>
     </div>
-<section class="almacenes-section">
 
-    <h2 class="section-title">
-        🏢 Almacenes
-    </h2>
-
-    <div class="create-card">
-
-        <input
-            type="text"
-            id="nombreAlmacen"
-            placeholder="Nombre del almacén"
-        >
-
-        <button id="btnCrearAlmacen">
-            ➕ Crear almacén
-        </button>
-
-    </div>
-
-    <div id="listaAlmacenes"></div>
-
-</section>
-
-<div id="listaAlmacenes"></div>
     <div class="status">
         <span class="online-dot"></span>
     </div>
@@ -56,71 +34,42 @@
 
 <main>
 
-    <section class="card">
+    <section class="almacenes-section">
 
-        <h2>Registrar Producto</h2>
+        <h2 class="section-title">
+            🏢 Almacenes
+        </h2>
 
-        <form id="formAddProduct">
-
-            <div class="input-group">
-                <label>Depósito</label>
-                <select id="depositoInput"></select>
-            </div>
-
-            <div class="input-group">
-                <label>Artículo</label>
-                <input
-                    type="text"
-                    id="articuloInput"
-                    placeholder="Ej: Chaleco"
-                    required
-                >
-            </div>
-
-            <div class="input-group">
-                <label>Cantidad</label>
-                <input
-                    type="number"
-                    id="cantidadInput"
-                    placeholder="0"
-                    required
-                >
-            </div>
-
-            <button type="submit" class="btn-save">
-                ➕ Guardar Producto
-            </button>
-
-        </form>
-
-    </section>
-
-    <section class="card">
-
-        <div class="search-box">
+        <div class="create-card">
 
             <input
                 type="text"
-                id="filterInput"
-                placeholder="🔎 Buscar artículo..."
+                id="nombreAlmacen"
+                placeholder="Nombre del almacén"
             >
+
+            <button id="btnCrearAlmacen">
+                ➕ Crear almacén
+            </button>
 
         </div>
 
-        <div id="depositTabs"></div>
-
-        <div id="stockContainer"></div>
+        <div id="listaAlmacenes"></div>
 
     </section>
 
 </main>
 
 <footer>
-    STF© 2026
+    STF © 2026
 </footer>
 
 <script type="module" src="firebase.js"></script>
 <script type="module" src="script.js"></script>
 
 </body>
+
 </html>
+
+
+
