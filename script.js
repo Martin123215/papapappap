@@ -236,3 +236,300 @@ async function(id){
   );
 
 };
+
+/* =========================
+INVENTARIO
+========================= */
+
+function renderInventario(){
+
+if(
+!almacenActivo ||
+!almacenes[almacenActivo]
+){
+return;
+}
+
+const almacen =
+almacenes[almacenActivo];
+
+tituloInventario.innerHTML =
+"🏢 " + almacen.nombre;
+
+let html = `
+
+  <form
+    class="product-form"
+    onsubmit="agregarProducto(event,'${almacenActivo}')"
+  ><input
+  type="text"
+  id="articulo-${almacenActivo}"
+  placeholder="Artículo"
+  required
+>
+
+<input
+  type="number"
+  id="cantidad-${almacenActivo}"
+  placeholder="Cantidad"
+  required
+>
+
+<button
+  class="btn-save"
+  type="submit"
+>
+  Agregar
+</button>
+
+  </form>`;
+
+html += renderProductos(
+almacenActivo
+);
+
+inventarioContenido.innerHTML =
+html;
+
+}
+
+function renderProductos(idAlmacen){
+
+const almacen =
+almacenes[idAlmacen];
+
+if(
+!almacen.productos
+){
+return "<p>Sin productos</p>";
+}
+
+let html = "";
+
+Object.keys(
+almacen.productos
+).forEach(idProducto => {
+
+const p =
+almacen.productos[idProducto];
+
+const precio =
+precios[p.articulo]
+? precios[p.articulo].precio
+: 0;
+
+const total =
+precio * p.cantidad;
+
+html += `
+
+<div class="producto">
+
+  <div class="producto-info">
+
+    <span>📦</span>
+
+    <span>${p.articulo}</span>
+
+    <strong>
+      Cantidad:
+      ${p.cantidad}
+    </strong>
+
+    <span>
+      $${total}
+    </span>
+
+  </div>
+
+  <div class="producto-actions">
+
+    <button
+      class="btn-plus"
+      onclick="sumar('${idAlmacen}','${idProducto}',${p.cantidad})"
+    >
+      +
+    </button>
+
+    <button
+      class="btn-minus"
+      onclick="restar('${idAlmacen}','${idProducto}',${p.cantidad})"
+    >
+      -
+    </button>
+
+    <button
+      class="btn-delete"
+      onclick="eliminarProducto('${idAlmacen}','${idProducto}')"
+    >
+      🗑
+    </button>
+
+  </div>
+
+</div>
+
+`;
+
+});
+
+return html;
+
+}
+
+window.agregarProducto =
+async function(
+e,
+idAlmacen
+){
+
+e.preventDefault();
+
+const articulo =
+document
+.getElementById(
+"articulo-${idAlmacen}"
+)
+.value
+.trim();
+
+const cantidad =
+parseInt(
+document
+.getElementById(
+"cantidad-${idAlmacen}"
+)
+.value
+);
+
+if(
+!articulo ||
+isNaN(cantidad)
+){
+return;
+}
+
+const productos =
+almacenes[idAlmacen]
+.productos || {};
+
+let existente = null;
+
+Object.keys(productos)
+.forEach(id => {
+
+if(
+  productos[id]
+  .articulo
+  .toLowerCase()
+  ===
+  articulo.toLowerCase()
+){
+
+  existente = {
+    id,
+    ...productos[id]
+  };
+
+}
+
+});
+
+if(existente){
+
+await update(
+  ref(
+    db,
+    `almacenes/${idAlmacen}/productos/${existente.id}`
+  ),
+  {
+    cantidad:
+    existente.cantidad +
+    cantidad
+  }
+);
+
+}else{
+
+await push(
+  ref(
+    db,
+    `almacenes/${idAlmacen}/productos`
+  ),
+  {
+    articulo,
+    cantidad
+  }
+);
+
+}
+
+};
+
+window.sumar =
+async function(
+idAlmacen,
+idProducto,
+cantidad
+){
+
+await update(
+ref(
+db,
+"almacenes/${idAlmacen}/productos/${idProducto}"
+),
+{
+cantidad:
+cantidad + 1
+}
+);
+
+};
+
+window.restar =
+async function(
+idAlmacen,
+idProducto,
+cantidad
+){
+
+if(cantidad <= 1){
+
+await remove(
+  ref(
+    db,
+    `almacenes/${idAlmacen}/productos/${idProducto}`
+  )
+);
+
+return;
+
+}
+
+await update(
+ref(
+db,
+"almacenes/${idAlmacen}/productos/${idProducto}"
+),
+{
+cantidad:
+cantidad - 1
+}
+);
+
+};
+
+window.eliminarProducto =
+async function(
+idAlmacen,
+idProducto
+){
+
+await remove(
+ref(
+db,
+"almacenes/${idAlmacen}/productos/${idProducto}"
+)
+);
+
+};
