@@ -8,7 +8,16 @@ import {
   onValue
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
+/* =========================
+   REFERENCIAS FIREBASE
+========================= */
+
 const almacenesRef = ref(db, "almacenes");
+const preciosRef = ref(db, "precios");
+
+/* =========================
+   ELEMENTOS HTML
+========================= */
 
 const btnCrearAlmacen =
 document.getElementById("btnCrearAlmacen");
@@ -19,19 +28,11 @@ document.getElementById("nombreAlmacen");
 const listaAlmacenes =
 document.getElementById("listaAlmacenes");
 
-let almacenes = {};
-let almacenActivo = null;
-
 const inventarioContenido =
 document.getElementById("inventarioContenido");
 
 const tituloInventario =
 document.getElementById("tituloInventario");
-
-const preciosRef =
-ref(db,"precios");
-
-let precios = {};
 
 const btnGuardarPrecio =
 document.getElementById("btnGuardarPrecio");
@@ -45,7 +46,19 @@ document.getElementById("valorPrecio");
 const listaPrecios =
 document.getElementById("listaPrecios");
 
-btnCrearAlmacen.addEventListener(
+/* =========================
+   VARIABLES
+========================= */
+
+let almacenes = {};
+let precios = {};
+let almacenActivo = null;
+
+/* =========================
+   CREAR ALMACEN
+========================= */
+
+btnCrearAlmacen?.addEventListener(
   "click",
   async () => {
 
@@ -69,6 +82,10 @@ btnCrearAlmacen.addEventListener(
   }
 );
 
+/* =========================
+   CARGAR ALMACENES
+========================= */
+
 onValue(
   almacenesRef,
   snapshot => {
@@ -76,137 +93,100 @@ onValue(
     almacenes =
     snapshot.val() || {};
 
+    renderAlmacenes();
+
     if(
-      !almacenActivo &&
-      Object.keys(almacenes).length > 0
+      almacenActivo &&
+      almacenes[almacenActivo]
     ){
-      almacenActivo =
-      Object.keys(almacenes)[0];
+      renderInventario();
     }
-onValue(preciosRef, snapshot => {
 
-  precios =
-  snapshot.val() || {};
-
-  renderPrecios();
-  renderEstadisticas();
-
-});
-
-    render();
-
-if(almacenActivo){
-  renderInventario();
-}
+    renderEstadisticas();
 
   }
 );
 
-function render(){
+/* =========================
+   CARGAR PRECIOS
+========================= */
 
-  let html = "";
+onValue(
+  preciosRef,
+  snapshot => {
 
-  Object.keys(almacenes).forEach(idAlmacen => {
+    precios =
+    snapshot.val() || {};
 
-    const almacen = almacenes[idAlmacen];
+    renderPrecios();
+    renderEstadisticas();
 
-html += `
-<div class="warehouse-card">
+  }
+);
 
-  <div class="warehouse-left">
+/* =========================
+   MENU
+========================= */
 
-    <div class="warehouse-icon">
-      🏢
-    </div>
+window.mostrarSeccion =
+function(id){
 
-    <div class="warehouse-info">
-      <h3>${almacen.nombre}</h3>
-    </div>
+  document
+  .querySelectorAll(".section")
+  .forEach(sec => {
 
-  </div>
-
-  <div class="warehouse-actions">
-
-    <button
-      class="btn-view"
-      onclick="verAlmacen('${idAlmacen}')"
-    >
-      👁 Ver
-    </button>
-
-    <button
-      class="btn-delete-small"
-      onclick="eliminarAlmacen('${idAlmacen}')"
-    >
-      🗑
-    </button>
-
-  </div>
-
-</div>
-`;
-    }
+    sec.style.display = "none";
 
   });
 
-  listaAlmacenes.innerHTML = html;
-}
+  document
+  .getElementById(id)
+  .style.display = "block";
 
-function renderProductos(idAlmacen){
+};
 
-  const almacen =
-  almacenes[idAlmacen];
+/* =========================
+   ALMACENES
+========================= */
 
-  if(!almacen.productos){
-    return "<p>Sin productos</p>";
-  }
+function renderAlmacenes(){
 
   let html = "";
 
-  Object.keys(
-    almacen.productos
-  ).forEach(idProducto => {
+  Object.keys(almacenes)
+  .forEach(idAlmacen => {
 
-    const p =
-    almacen.productos[idProducto];
+    const almacen =
+    almacenes[idAlmacen];
 
     html += `
 
-    <div class="producto">
+    <div class="warehouse-card">
 
-      <div class="producto-info">
+      <div class="warehouse-left">
 
-        <span>📦</span>
+        <div class="warehouse-icon">
+          🏢
+        </div>
 
-        <span>
-          ${p.articulo}
-        </span>
-
-        <strong>
-          ${p.cantidad}
-        </strong>
+        <div class="warehouse-info">
+          <h3>${almacen.nombre}</h3>
+        </div>
 
       </div>
 
-      <div class="producto-actions">
+      <div class="warehouse-actions">
 
         <button
-          class="btn-plus"
-          onclick="sumar('${idAlmacen}','${idProducto}',${p.cantidad})"
+          class="btn-view"
+          onclick="verAlmacen('${idAlmacen}')"
         >
-          +
+          👁 Ver
         </button>
 
         <button
-          class="btn-minus"
-          onclick="restar('${idAlmacen}','${idProducto}',${p.cantidad})"
-        >
-          -
-        </button>
-
-        <button
-          class="btn-delete"
-          onclick="eliminarProducto('${idAlmacen}','${idProducto}')"
+          class="btn-delete-small"
+          onclick="eliminarAlmacen('${idAlmacen}')"
         >
           🗑
         </button>
@@ -216,155 +196,24 @@ function renderProductos(idAlmacen){
     </div>
 
     `;
+
   });
 
-  return html;
+  listaAlmacenes.innerHTML = html;
+
 }
 
-window.agregarProducto =
-async function(
-  e,
-  idAlmacen
-){
+window.verAlmacen =
+function(idAlmacen){
 
-  e.preventDefault();
+  almacenActivo =
+  idAlmacen;
 
-  const articulo =
-  document
-  .getElementById(
-    `articulo-${idAlmacen}`
-  )
-  .value
-  .trim();
-
-  const cantidad =
-  parseInt(
-    document
-    .getElementById(
-      `cantidad-${idAlmacen}`
-    )
-    .value
+  mostrarSeccion(
+    "inventario"
   );
 
-  const productos =
-  almacenes[idAlmacen]
-  .productos || {};
-
-  let existente = null;
-
-  Object.keys(productos)
-  .forEach(id => {
-
-    if(
-      productos[id]
-      .articulo
-      .toLowerCase()
-      ===
-      articulo.toLowerCase()
-    ){
-      existente = {
-        id,
-        ...productos[id]
-      };
-    }
-
-  });
-
-  if(existente){
-
-    await update(
-      ref(
-        db,
-        `almacenes/${idAlmacen}/productos/${existente.id}`
-      ),
-      {
-        cantidad:
-        existente.cantidad +
-        cantidad
-      }
-    );
-
-  }else{
-
-    await push(
-      ref(
-        db,
-        `almacenes/${idAlmacen}/productos`
-      ),
-      {
-        articulo,
-        cantidad
-      }
-    );
-
-  }
-
-};
-
-window.sumar =
-async function(
-  idAlmacen,
-  idProducto,
-  cantidad
-){
-
-  await update(
-    ref(
-      db,
-      `almacenes/${idAlmacen}/productos/${idProducto}`
-    ),
-    {
-      cantidad:
-      cantidad + 1
-    }
-  );
-
-};
-
-window.restar =
-async function(
-  idAlmacen,
-  idProducto,
-  cantidad
-){
-
-  if(cantidad <= 1){
-
-    await remove(
-      ref(
-        db,
-        `almacenes/${idAlmacen}/productos/${idProducto}`
-      )
-    );
-
-    return;
-  }
-
-  await update(
-    ref(
-      db,
-      `almacenes/${idAlmacen}/productos/${idProducto}`
-    ),
-    {
-      cantidad:
-      cantidad - 1
-    }
-  );
-
-};
-
-window.eliminarProducto =
-async function(
-  idAlmacen,
-  idProducto
-){
-
-  await remove(
-    ref(
-      db,
-      `almacenes/${idAlmacen}/productos/${idProducto}`
-    )
-  );
+  renderInventario();
 
 };
 
@@ -387,201 +236,3 @@ async function(id){
   );
 
 };
-
-window.verAlmacen = function(idAlmacen){
-
-  almacenActivo = idAlmacen;
-
-  mostrarSeccion("inventario");
-
-  renderInventario();
-
-};
-
-window.mostrarSeccion = function(id){
-
-  document
-  .querySelectorAll(".section")
-  .forEach(sec => {
-
-    sec.style.display = "none";
-
-  });
-
-  document
-  .getElementById(id)
-  .style.display = "block";
-
-};
-
-function renderInventario(){
-
-  if(
-    !almacenActivo ||
-    !almacenes[almacenActivo]
-  ){
-    return;
-  }
-
-  const almacen =
-  almacenes[almacenActivo];
-
-  tituloInventario.innerHTML =
-  "🏢 " + almacen.nombre;
-
-  let html = `
-
-  <form
-    class="product-form"
-    onsubmit="agregarProducto(event,'${almacenActivo}')"
-  >
-
-    <input
-      type="text"
-      id="articulo-${almacenActivo}"
-      placeholder="Artículo"
-      required
-    >
-
-    <input
-      type="number"
-      id="cantidad-${almacenActivo}"
-      placeholder="Cantidad"
-      required
-    >
-
-    <button
-      class="btn-save"
-      type="submit"
-    >
-      Agregar
-    </button>
-
-  </form>
-
-  `;
-
-  html += renderProductos(
-    almacenActivo
-  );
-
-  inventarioContenido.innerHTML =
-  html;
-
-}
-
-btnGuardarPrecio?.addEventListener(
-  "click",
-  async () => {
-
-    const nombre =
-    nombrePrecio.value.trim();
-
-    const precio =
-    parseFloat(valorPrecio.value);
-
-    if(!nombre || !precio){
-      return;
-    }
-
-    await push(
-      preciosRef,
-      {
-        nombre,
-        precio
-      }
-    );
-
-    nombrePrecio.value = "";
-    valorPrecio.value = "";
-
-  }
-);
-
-function renderPrecios(){
-
-  let html = "";
-
-  Object.keys(precios).forEach(id => {
-
-    const p = precios[id];
-
-    html += `
-      <div class="precio-card">
-
-        <div>
-          <strong>${p.nombre}</strong>
-          <br>
-          $${p.precio}
-        </div>
-
-        <button
-          class="btn-delete"
-          onclick="eliminarPrecio('${id}')"
-        >
-          🗑
-        </button>
-
-      </div>
-    `;
-
-  });
-
-  listaPrecios.innerHTML = html;
-
-}window.eliminarPrecio =
-async function(id){
-
-  await remove(
-    ref(db,"precios/" + id)
-  );
-
-};
-
-function renderEstadisticas(){
-
-  let total = 0;
-
-  Object.keys(almacenes).forEach(idAlmacen => {
-
-    const almacen =
-    almacenes[idAlmacen];
-
-    if(!almacen.productos){
-      return;
-    }
-
-    Object.keys(
-      almacen.productos
-    ).forEach(idProducto => {
-
-      const producto =
-      almacen.productos[idProducto];
-
-      const precio =
-      Object.values(precios)
-      .find(
-        p =>
-        p.nombre.toLowerCase()
-        ===
-        producto.articulo.toLowerCase()
-      );
-
-      if(precio){
-
-        total +=
-        producto.cantidad *
-        precio.precio;
-
-      }
-
-    });
-
-  });
-
-  document.getElementById(
-    "totalGeneral"
-  ).innerHTML =
-  "$" + total.toLocaleString();
-
-}
