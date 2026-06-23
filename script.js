@@ -33,6 +33,18 @@ ref(db,"precios");
 
 let precios = {};
 
+const btnGuardarPrecio =
+document.getElementById("btnGuardarPrecio");
+
+const nombrePrecio =
+document.getElementById("nombrePrecio");
+
+const valorPrecio =
+document.getElementById("valorPrecio");
+
+const listaPrecios =
+document.getElementById("listaPrecios");
+
 btnCrearAlmacen.addEventListener(
   "click",
   async () => {
