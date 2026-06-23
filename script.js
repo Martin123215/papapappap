@@ -61,68 +61,90 @@ function render(){
 
   let html = "";
 
-  Object.keys(almacenes)
-  .forEach(idAlmacen => {
+  Object.keys(almacenes).forEach(idAlmacen => {
 
-    const almacen =
-    almacenes[idAlmacen];
+    const almacen = almacenes[idAlmacen];
 
     html += `
+      <div class="warehouse-card">
 
-    <div class="almacen-card">
+        <div class="warehouse-left">
 
-      <div class="almacen-header">
+          <div class="warehouse-icon">
+            🏢
+          </div>
 
-        <h3>
-          🏢 ${almacen.nombre}
-        </h3>
+          <div class="warehouse-info">
+            <h3>${almacen.nombre}</h3>
+          </div>
 
-        <button
-          class="btn-delete"
-          onclick="eliminarAlmacen('${idAlmacen}')"
+        </div>
+
+        <div class="warehouse-actions">
+
+          <button
+            class="btn-view"
+            onclick="verAlmacen('${idAlmacen}')"
+          >
+            👁 Ver
+          </button>
+
+          <button
+            class="btn-delete-small"
+            onclick="eliminarAlmacen('${idAlmacen}')"
+          >
+            🗑
+          </button>
+
+        </div>
+
+      </div>
+    `;
+
+    if(almacenActivo === idAlmacen){
+
+      html += `
+
+      <div class="almacen-card">
+
+        <form
+          class="product-form"
+          onsubmit="agregarProducto(event,'${idAlmacen}')"
         >
-          Eliminar
-        </button>
+
+          <input
+            type="text"
+            id="articulo-${idAlmacen}"
+            placeholder="Artículo"
+            required
+          >
+
+          <input
+            type="number"
+            id="cantidad-${idAlmacen}"
+            placeholder="Cantidad"
+            required
+          >
+
+          <button
+            class="btn-save"
+            type="submit"
+          >
+            Agregar
+          </button>
+
+        </form>
+
+        ${renderProductos(idAlmacen)}
 
       </div>
 
-      <form
-        class="product-form"
-        onsubmit="agregarProducto(event,'${idAlmacen}')"
-      >
+      `;
+    }
 
-        <input
-          type="text"
-          id="articulo-${idAlmacen}"
-          placeholder="Artículo"
-          required
-        >
-
-        <input
-          type="number"
-          id="cantidad-${idAlmacen}"
-          placeholder="Cantidad"
-          required
-        >
-
-        <button
-          class="btn-save"
-          type="submit"
-        >
-          Agregar
-        </button>
-
-      </form>
-
-      ${renderProductos(idAlmacen)}
-
-    </div>
-
-    `;
   });
 
   listaAlmacenes.innerHTML = html;
-
 }
 
 function renderProductos(idAlmacen){
@@ -363,18 +385,11 @@ async function(id){
 
 window.verAlmacen = function(idAlmacen){
 
-  const tarjeta =
-  document.getElementById(
-    "almacen-" + idAlmacen
-  );
-
-  if(tarjeta){
-
-    tarjeta.scrollIntoView({
-      behavior:"smooth",
-      block:"start"
-    });
-
+  if(almacenActivo === idAlmacen){
+    almacenActivo = null;
+  }else{
+    almacenActivo = idAlmacen;
   }
 
+  render();
 };
