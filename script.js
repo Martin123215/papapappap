@@ -53,6 +53,14 @@ onValue(
     almacenes =
     snapshot.val() || {};
 
+    if(
+      !almacenActivo &&
+      Object.keys(almacenes).length > 0
+    ){
+      almacenActivo =
+      Object.keys(almacenes)[0];
+    }
+
     render();
 
   }
