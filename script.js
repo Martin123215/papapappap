@@ -22,6 +22,17 @@ document.getElementById("listaAlmacenes");
 let almacenes = {};
 let almacenActivo = null;
 
+const inventarioContenido =
+document.getElementById("inventarioContenido");
+
+const tituloInventario =
+document.getElementById("tituloInventario");
+
+const preciosRef =
+ref(db,"precios");
+
+let precios = {};
+
 btnCrearAlmacen.addEventListener(
   "click",
   async () => {
