@@ -360,3 +360,21 @@ async function(id){
   );
 
 };
+
+window.verAlmacen = function(idAlmacen){
+
+  const tarjeta =
+  document.getElementById(
+    "almacen-" + idAlmacen
+  );
+
+  if(tarjeta){
+
+    tarjeta.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+
+  }
+
+};
