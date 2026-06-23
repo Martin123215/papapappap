@@ -405,11 +405,10 @@ async function(id){
 
 window.verAlmacen = function(idAlmacen){
 
-  if(almacenActivo === idAlmacen){
-    almacenActivo = null;
-  }else{
-    almacenActivo = idAlmacen;
-  }
+  almacenActivo = idAlmacen;
 
-  render();
+  mostrarSeccion("inventario");
+
+  renderInventario();
+
 };
