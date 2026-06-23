@@ -469,3 +469,119 @@ function renderInventario(){
   html;
 
 }
+
+btnGuardarPrecio?.addEventListener(
+  "click",
+  async () => {
+
+    const nombre =
+    nombrePrecio.value.trim();
+
+    const precio =
+    parseFloat(valorPrecio.value);
+
+    if(!nombre || !precio){
+      return;
+    }
+
+    await push(
+      preciosRef,
+      {
+        nombre,
+        precio
+      }
+    );
+
+    nombrePrecio.value = "";
+    valorPrecio.value = "";
+
+  }
+);
+
+function renderPrecios(){
+
+  let html = "";
+
+  Object.keys(precios).forEach(id => {
+
+    const p = precios[id];
+
+    html += `
+      <div class="precio-card">
+
+        <div>
+          <strong>${p.nombre}</strong>
+          <br>
+          $${p.precio}
+        </div>
+
+        <button
+          class="btn-delete"
+          onclick="eliminarPrecio('${id}')"
+        >
+          🗑
+        </button>
+
+      </div>
+    `;
+
+  });
+
+  listaPrecios.innerHTML = html;
+
+}window.eliminarPrecio =
+async function(id){
+
+  await remove(
+    ref(db,"precios/" + id)
+  );
+
+};
+
+function renderEstadisticas(){
+
+  let total = 0;
+
+  Object.keys(almacenes).forEach(idAlmacen => {
+
+    const almacen =
+    almacenes[idAlmacen];
+
+    if(!almacen.productos){
+      return;
+    }
+
+    Object.keys(
+      almacen.productos
+    ).forEach(idProducto => {
+
+      const producto =
+      almacen.productos[idProducto];
+
+      const precio =
+      Object.values(precios)
+      .find(
+        p =>
+        p.nombre.toLowerCase()
+        ===
+        producto.articulo.toLowerCase()
+      );
+
+      if(precio){
+
+        total +=
+        producto.cantidad *
+        precio.precio;
+
+      }
+
+    });
+
+  });
+
+  document.getElementById(
+    "totalGeneral"
+  ).innerHTML =
+  "$" + total.toLocaleString();
+
+}
