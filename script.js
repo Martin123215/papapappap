@@ -294,21 +294,95 @@ btnGuardarPrecio.addEventListener("click", async () => {
 });
 
 function renderPrecios() {
+
   let html = "";
 
   Object.keys(precios).forEach(id => {
+
     const p = precios[id];
 
     html += `
+
       <div class="precio-card">
-        <span>${p.nombre}</span>
-        <strong>$${p.precio}</strong>
+
+        <div class="precio-info">
+
+          <strong>${p.nombre}</strong>
+
+          <span>$${p.precio}</span>
+
+        </div>
+
+        <div class="producto-actions">
+
+          <button
+            class="btn-view"
+            onclick="editarPrecio('${id}')"
+          >
+            ✏️
+          </button>
+
+          <button
+            class="btn-delete-small"
+            onclick="eliminarPrecio('${id}')"
+          >
+            🗑
+          </button>
+
+        </div>
+
       </div>
+
     `;
   });
 
   listaPrecios.innerHTML = html;
 }
+
+window.editarPrecio = async function(id) {
+
+  const precioActual =
+    precios[id];
+
+  const nuevoPrecio = prompt(
+    "Nuevo precio para " +
+    precioActual.nombre,
+    precioActual.precio
+  );
+
+  if (
+    nuevoPrecio === null ||
+    nuevoPrecio === ""
+  ) {
+    return;
+  }
+
+  await update(
+    ref(db, "precios/" + id),
+    {
+      precio: parseFloat(nuevoPrecio)
+    }
+  );
+
+};
+
+window.eliminarPrecio = async function(id) {
+
+  if(
+    !confirm("¿Eliminar precio?")
+  ){
+    return;
+  }
+
+  await remove(
+    ref(
+      db,
+      "precios/" + id
+    )
+  );
+
+};
+
 
 /* =========================
    ESTADISTICAS
