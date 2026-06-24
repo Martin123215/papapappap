@@ -138,47 +138,97 @@ window.eliminarAlmacen = async function (id) {
 ========================= */
 
 function renderInventario() {
+
   if (!almacenActivo || !almacenes[almacenActivo]) return;
 
   const almacen = almacenes[almacenActivo];
 
-  tituloInventario.innerHTML = "🏢 " + almacen.nombre;
+  tituloInventario.innerHTML =
+    "🏢 " + almacen.nombre;
 
   let html = `
+
     <form class="product-form" onsubmit="agregarProducto(event)">
-      <input type="text" id="articulo" placeholder="Artículo" required>
-      <input type="number" id="cantidad" placeholder="Cantidad" required>
-      <button class="btn-save" type="submit">Agregar</button>
+
+      <input
+        type="text"
+        id="articulo"
+        placeholder="Artículo"
+        required
+      >
+
+      <input
+        type="number"
+        id="cantidad"
+        placeholder="Cantidad"
+        required
+      >
+
+      <button
+        class="btn-save"
+        type="submit"
+      >
+        Agregar
+      </button>
+
     </form>
+
+    <div class="inventario-header">
+      <span><strong>Artículo</strong></span>
+      <span><strong>Cantidad</strong></span>
+      <span><strong>Acciones</strong></span>
+    </div>
+
   `;
 
-  const productos = almacen.productos || {};
+  const productos =
+    almacen.productos || {};
 
   Object.keys(productos).forEach(id => {
+
     const p = productos[id];
-    const precio = precios[p.articulo]?.precio || 0;
-    const total = precio * p.cantidad;
 
     html += `
+
       <div class="producto">
+
         <div class="producto-info">
-          <span>📦 ${p.articulo}</span>
+
+          <span>${p.articulo}</span>
+
           <strong>${p.cantidad}</strong>
-          <span>$${total}</span>
+
         </div>
 
         <div class="producto-actions">
-          <button onclick="sumar('${id}', ${p.cantidad})">+</button>
-          <button onclick="restar('${id}', ${p.cantidad})">-</button>
-          <button onclick="eliminarProducto('${id}')">🗑</button>
+
+          <button
+            onclick="sumar('${id}', ${p.cantidad})"
+          >
+            +
+          </button>
+
+          <button
+            onclick="restar('${id}', ${p.cantidad})"
+          >
+            -
+          </button>
+
+          <button
+            onclick="eliminarProducto('${id}')"
+          >
+            🗑
+          </button>
+
         </div>
+
       </div>
+
     `;
   });
 
   inventarioContenido.innerHTML = html;
 }
-
 /* =========================
    PRODUCTOS
 ========================= */
