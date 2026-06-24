@@ -389,16 +389,66 @@ window.eliminarPrecio = async function(id) {
 ========================= */
 
 function renderEstadisticas() {
-  let total = 0;
 
-  Object.values(almacenes).forEach(a => {
-    const productos = a.productos || {};
+  let totalGeneralInventario = 0;
+
+  let detalle = "";
+
+  Object.values(almacenes).forEach(almacen => {
+
+    const productos =
+      almacen.productos || {};
+
+    let totalAlmacen = 0;
 
     Object.values(productos).forEach(p => {
-      const precio = precios[p.articulo]?.precio || 0;
-      total += precio * p.cantidad;
+
+      let precioProducto = 0;
+
+      Object.values(precios).forEach(precio => {
+
+        if (
+          precio.nombre.toLowerCase() ===
+          p.articulo.toLowerCase()
+        ) {
+          precioProducto =
+            precio.precio;
+        }
+
+      });
+
+      totalAlmacen +=
+        precioProducto * p.cantidad;
+
     });
+
+    totalGeneralInventario +=
+      totalAlmacen;
+
+    detalle += `
+
+      <div class="estadistica-item">
+
+        <strong>
+          ${almacen.nombre}
+        </strong>
+
+        <span>
+          $${totalAlmacen.toLocaleString()}
+        </span>
+
+      </div>
+
+    `;
+
   });
 
-  totalGeneral.innerText = "$" + total;
+  totalGeneral.innerHTML =
+    "$" +
+    totalGeneralInventario.toLocaleString();
+
+  detalleEstadisticas.innerHTML =
+    detalle;
+
 }
+
